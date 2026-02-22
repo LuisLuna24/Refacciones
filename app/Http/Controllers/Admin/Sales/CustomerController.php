@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Controllers\Admin\Sales;
+
+use App\Http\Controllers\Controller;
+use App\Models\Customer;
+use App\Models\Identity;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Session;
+
+class CustomerController extends Controller
+{
+    public function index()
+    {
+        Gate::authorize('view-customers');
+        return view("Admin.Sales.customers.index");
+    }
+
+    public function create()
+    {
+        Gate::authorize('create-customers');
+
+        return view("Admin.Sales.customers.create");
+    }
+
+    public function edit(Customer $customer)
+    {
+        Gate::authorize('edit-customers');
+
+        return view("Admin.Sales.customers.edit", compact("customer"));
+    }
+
+    public function destroy(Customer $customer)
+    {
+        Gate::authorize('delete-customers');
+
+        if ($customer->quotes()->exists()) {
+            Session::flash('swal', [
+                'icon' => 'error',
+                'title' => 'Error!',
+                'text' => 'No se puede eliminar el producto porque tiene cotizaciones asociadas!',
+            ]);
+        }
+
+        if ($customer->sales()->exists()) {
+            Session::flash('swal', [
+                'icon' => 'error',
+                'title' => 'Error!',
+                'text' => 'No se puede eliminar el producto porque tiene ventas asociadas!',
+            ]);
+        }
+
+        $customer->delete();
+
+        Session::flash('swal', [
+            'icon' => 'success',
+            'title' => '¡Eliminado con éxito!',
+            'text' => 'El cliente se ha eliminado con éxito',
+        ]);
+
+        return redirect()->route('admin.customers.index');
+    }
+}

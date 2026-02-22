@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Http\Controllers\Admin\Movements;
+
+use App\Http\Controllers\Controller;
+use App\Models\Transfer;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+
+class TransferController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        Gate::authorize('view-transfers');
+        return view("Admin.Movements.transfers.index");
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        Gate::authorize('create-transfers');
+        return view("Admin.Movements.transfers.create");
+    }
+
+     public function pdf(Transfer $transfer)
+    {
+        $pdf = Pdf::loadView('admin.movements.transfers.pdf', [
+            'model' => $transfer,
+        ]);
+
+        return $pdf->download("transferencia{$transfer->id}.pdf");
+    }
+}
