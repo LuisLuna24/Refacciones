@@ -103,6 +103,12 @@ class PermissionSeeder extends Seeder
             'edit-roles',
             'delete-roles',
             'view-roles',
+
+            //Delivery notes
+            'create-delivery-notes',
+            'edit-delivery-notes',
+            'delete-delivery-notes',
+            'view-delivery-notes',
         ];
 
         foreach ($permissions as $permission) {

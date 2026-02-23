@@ -122,6 +122,7 @@ class SaleCreate extends Component
             'products.*.price' => ['required', 'numeric', 'min:0'],
         ], [], [
             'customer_id' => 'cliente',
+            'warehouse_id' => 'almacen',
             'products' => 'productos',
             'total' => 'total de la venta'
         ]);

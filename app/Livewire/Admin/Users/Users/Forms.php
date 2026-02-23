@@ -43,6 +43,7 @@ class Forms extends Component
             $data = [
                 'name' => $this->name,
                 'email' => $this->email,
+                'type_user_id' => 2
             ];
 
             if ($this->password) {

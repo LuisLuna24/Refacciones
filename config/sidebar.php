@@ -86,7 +86,7 @@ return [
         'type' => 'group',
         'title' => 'Ventas',
         'icon' => 'svg/cash-register.svg',
-        'active' => ['admin.customers.*', 'admin.quotes.*', 'admin.sales.*'],
+        'active' => ['admin.customers.*', 'admin.quotes.*', 'admin.sales.*','admin.delivery_notes.*'],
         'items' => [
             [
                 'type' => 'link',
@@ -103,6 +103,14 @@ return [
                 'route' => 'admin.quotes.index',
                 'active' => 'admin.quotes.*',
                 'can' => ['view-quotes'],
+            ],
+            [
+                'type' => 'link',
+                'title' => 'Notas',
+                'icon' => 'svg/clipboard-text.svg',
+                'route' => 'admin.delivery_notes.index',
+                'active' => 'admin.delivery_notes.*',
+                'can' => ['view-delivery-notes'],
             ],
             [
                 'type' => 'link',

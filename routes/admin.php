@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Purchase\PurchaseOrderController;
 use App\Http\Controllers\Admin\Purchase\SupplierController;
 use App\Http\Controllers\Admin\Reports\ReportController;
 use App\Http\Controllers\Admin\Sales\CustomerController;
+use App\Http\Controllers\Admin\Sales\DeliveryNoteController;
 use App\Http\Controllers\Admin\Sales\QuoteController;
 use App\Http\Controllers\Admin\Sales\SaleController;
 use App\Http\Controllers\Admin\Users\RoleController;
@@ -99,3 +100,7 @@ Route::resource('users', UsersController::class)->only('index', 'create', 'edit'
 //========== Roles
 
 Route::resource('roles', RoleController::class)->only('index', 'create', 'edit','destroy');
+
+//========== Delivery Notes
+
+Route::resource('delivery_notes', DeliveryNoteController::class)->only('index', 'create', 'edit');
