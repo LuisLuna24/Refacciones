@@ -10,11 +10,11 @@
 
             {{-- Acciones rápidas (Solo visibles si NO está Entregada) --}}
             @if ($deliveryNote->status !== 3)
-                <x-w-button wire:click="noteDelivery({{ $deliveryNote->id }})" icon="check" green xs>
+                <x-w-button wire:click="noteDelivery({{ $deliveryNote->id }})" green xs>
                     Entregado
                 </x-w-button>
 
-                <x-w-button wire:click="noteCancel({{ $deliveryNote->id }})" icon="x" red xs>
+                <x-w-button wire:click="noteCancel({{ $deliveryNote->id }})" red xs>
                     Cancelar
                 </x-w-button>
             @endif

@@ -26,6 +26,11 @@ class Forms extends Component
     public $installment = 0;
     public $status = 1;
 
+    public $guest_name;
+    public $guest_phone;
+    public $guest_email;
+
+
     public $items = [];
 
     public function mount()
@@ -38,6 +43,9 @@ class Forms extends Component
         if (isset($this->deliveryNote)) {
             $this->id = $this->deliveryNote->id;
             $this->customer_id = $this->deliveryNote->customer_id;
+            $this->guest_name = $this->deliveryNote->guest_name;
+            $this->guest_phone = $this->deliveryNote->guest_phone;
+            $this->guest_email = $this->deliveryNote->guest_email;
             $this->warehouse_id = $this->deliveryNote->warehouse_id;
             $this->voucher_type = $this->deliveryNote->voucher_type;
             $this->serie = $this->deliveryNote->serie;
@@ -107,6 +115,9 @@ class Forms extends Component
     {
         $this->validate([
             'customer_id' => ['nullable', 'exists:customers,id'],
+            'guest_name' => ['nullable', 'string','max:100'],
+            'guest_phone' => ['nullable', 'string','max:20'],
+            'guest_email' => ['nullable', 'string','max:100'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'voucher_type' => ['required', 'in:1,2'],
             'items' => ['required', 'array', 'min:1'],
@@ -130,6 +141,9 @@ class Forms extends Component
                 ['id' => $this->id ?? null],
                 [
                     'customer_id' => $this->customer_id ?: null,
+                    'guest_name' => $this->guest_name ?: null,
+                    'guest_phone' => $this->guest_phone ?: null,
+                    'guest_email' => $this->guest_email ?: null,
                     'warehouse_id' => $this->warehouse_id,
                     'voucher_type' => $this->voucher_type,
                     'serie' => $this->serie,
@@ -162,6 +176,9 @@ class Forms extends Component
                 $text = 'Creado correctamente';
                 $this->reset([
                     'customer_id',
+                    'guest_name',
+                    'guest_phone',
+                    'guest_email',
                     'warehouse_id',
                     'serie',
                     'correlative',

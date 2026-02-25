@@ -22,11 +22,13 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
 
+            {{-- Selección de Cliente Registrado --}}
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cliente (Opcional)</label>
-                <select wire:model="customer_id" {{ $status == 3 ? 'disabled' : '' }}
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cliente Registrado
+                    (Opcional)</label>
+                <select wire:model.live="customer_id" {{ $status == 3 ? 'disabled' : '' }}
                     class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
-                    <option value="">-- Sin cliente (Público general) --</option>
+                    <option value="">-- Público General / Ocasional --</option>
                     @foreach ($customers as $customer)
                         <option value="{{ $customer->id }}">{{ $customer->name }}</option>
                     @endforeach
@@ -34,6 +36,7 @@
                 <x-input-error for="customer_id" />
             </div>
 
+            {{-- Almacén --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Almacén *</label>
                 <select wire:model="warehouse_id" required {{ $status == 3 ? 'disabled' : '' }}
@@ -46,20 +49,59 @@
                 <x-input-error for="warehouse_id" />
             </div>
 
+            {{-- Serie y Correlativo --}}
             <div class="flex space-x-2">
                 <div class="w-1/3">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Serie *</label>
                     <input type="text" wire:model="serie" required {{ $status == 3 ? 'disabled' : '' }}
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
                     <x-input-error for="serie" />
                 </div>
                 <div class="w-2/3">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Correlativo *</label>
                     <input type="text" wire:model="correlative" required {{ $status == 3 ? 'disabled' : '' }}
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
                     <x-input-error for="correlative" />
                 </div>
             </div>
+
+            {{-- INICIO: CAMPOS PARA CLIENTE OCASIONAL (Se muestran si no hay customer_id) --}}
+            @if (empty($customer_id))
+                <div
+                    class="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4 bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-100 dark:border-blue-800/30 mt-2">
+                    <div class="md:col-span-3 mb-1">
+                        <span class="text-sm font-semibold text-blue-800 dark:text-blue-300">Datos del Cliente
+                            Ocasional</span>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre *</label>
+                        <input type="text" wire:model="guest_name" required {{ $status == 3 ? 'disabled' : '' }}
+                            placeholder="Ej: Juan Pérez"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
+                        <x-input-error for="guest_name" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Teléfono
+                            (Opcional)</label>
+                        <input type="text" wire:model="guest_phone" {{ $status == 3 ? 'disabled' : '' }}
+                            placeholder="Ej: 555-1234"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
+                        <x-input-error for="guest_phone" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Correo
+                            (Opcional)</label>
+                        <input type="email" wire:model="guest_email" {{ $status == 3 ? 'disabled' : '' }}
+                            placeholder="ejemplo@correo.com"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors">
+                        <x-input-error for="guest_email" />
+                    </div>
+                </div>
+            @endif
+            {{-- FIN: CAMPOS PARA CLIENTE OCASIONAL --}}
 
         </div>
 
@@ -79,7 +121,7 @@
                                 Catálogo</label>
                             <select wire:model="items.{{ $index }}.product_id"
                                 {{ $status == 3 ? 'disabled' : '' }}
-                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
                                 <option value="">-- Personalizado --</option>
                                 @foreach ($catalogProducts as $product)
                                     <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -92,14 +134,14 @@
                                 del trabajo *</label>
                             <input type="text" wire:model="items.{{ $index }}.description" required
                                 {{ $status == 3 ? 'disabled' : '' }} placeholder="Ej: Rotulación a medida..."
-                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
                         </div>
 
                         <div class="w-1/6">
                             <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Cant.</label>
                             <input type="number" step="0.01" wire:model.live="items.{{ $index }}.quantity"
                                 required {{ $status == 3 ? 'disabled' : '' }}
-                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
                         </div>
 
                         <div class="w-1/6">
@@ -107,7 +149,7 @@
                                 Unit.</label>
                             <input type="number" step="0.01" wire:model.live="items.{{ $index }}.price"
                                 required {{ $status == 3 ? 'disabled' : '' }}
-                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+                                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
                         </div>
 
                         {{-- Solo mostramos el botón de eliminar si NO está entregado --}}

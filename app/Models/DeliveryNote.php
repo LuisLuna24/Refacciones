@@ -10,6 +10,9 @@ class DeliveryNote extends Model
     use HasFactory;
     protected $fillable = [
         'customer_id',
+        'guest_name',
+        'guest_phone',
+        'guest_email',
         'warehouse_id',
         'voucher_type',
         'serie',

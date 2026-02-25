@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\DB;
 
 class DeliveryNoteTable extends DataTableComponent
 {
-    protected $model = DeliveryNote::class;
+
+    public function builder(): Builder
+    {
+        return DeliveryNote::query()
+            ->with(['customer', 'warehouse'])
+            ->select('delivery_notes.*');
+    }
 
     public function configure(): void
     {
@@ -26,6 +32,7 @@ class DeliveryNoteTable extends DataTableComponent
         return [
             Column::make("Id", "id")
                 ->sortable(),
+
             Column::make("Nro Comprobante")
                 ->label(
                     fn($row) => $row->serie . '-' . $row->correlative
@@ -41,12 +48,20 @@ class DeliveryNoteTable extends DataTableComponent
             Column::make("Correlative", "correlative")
                 ->sortable()
                 ->deselected(),
+
+            Column::make("Cliente", "customer_id")
+                ->sortable()
+                // Usamos $value y $row. $row ya tendrá el guest_name gracias al select('delivery_notes.*') del builder
+                ->format(fn($value, $row) => $row->customer?->name ?? $row->guest_name ?? 'Sin Asignar'),
+
             Column::make("Fecha", "date")
                 ->sortable()
                 ->format(fn($value) => $value->format('Y-m-d')),
+
             Column::make("Total", "total")
                 ->sortable()
-                ->format(fn($value) => '$ ' . number_format($value, 2, '.', ',')),
+                ->format(fn($value) => '$ ' . number_format((float) $value, 2, '.', ',')),
+
             Column::make("Estatus", 'status')
                 ->format(fn($value, $row, $column) => match ((int) $row->status) {
                     0 => '<span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full dark:bg-red-900 dark:text-red-300">Cancelado</span>',
@@ -55,8 +70,9 @@ class DeliveryNoteTable extends DataTableComponent
                     3 => '<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full dark:bg-green-900 dark:text-green-300">Entregado</span>',
                     default => '<span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">Desconocido</span>',
                 })
-                ->html() // No olvides esto para que se vean los colores y no el código HTML
+                ->html()
                 ->sortable(),
+
             Column::make("Acciones")
                 ->label(function ($row) {
                     return view('Admin.Sales.delivery-notes.actions', ['deliveryNote' => $row]);
@@ -83,8 +99,6 @@ class DeliveryNoteTable extends DataTableComponent
         $this->deliveryNoteId = $id;
         $this->newStatus = 0;
     }
-
-
 
     public function saveNoteDelivery()
     {
