@@ -1,6 +1,6 @@
 <div class="flex items-center space-x-2">
     @can('view-products')
-        <x-w-button href="{{ route('admin.products.kardex', $product) }}" green xs>{!! file_get_contents(public_path('svg/stack-2.svg')) !!}</x-w-button>
+        <x-w-button href="{{ route('admin.products.Kardex', $product) }}" green xs>{!! file_get_contents(public_path('svg/stack-2.svg')) !!}</x-w-button>
     @endcan
     @can('edit-products')
         <x-w-button href="{{ route('admin.products.edit', $product) }}" blue xs>{!! file_get_contents(public_path('svg/edit.svg')) !!}</x-w-button>

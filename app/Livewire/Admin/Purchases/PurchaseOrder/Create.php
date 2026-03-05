@@ -79,15 +79,12 @@ class Create extends Component
 
         $product = Product::find($this->product_id);
 
-        // Obtener el último costo registrado para sugerirlo
-        $lastRecord = Kardex::getLastRecord($product->id, $this->warehouse_id);
-
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $lastRecord['cost'] ?? $product->cost,
+            'price' => $product->cost_package ?? $product->cost,
             'quantity' => 1,
-            'subtotal' => $lastRecord['cost'] ?? $product->cost,
+            'subtotal' => $product->cost_package ?? $product->cost,
             'sku' => $product->sku ?? '',
         ];
 
@@ -152,14 +149,12 @@ class Create extends Component
         $warehouseId = $this->warehouse_id;
         $supplierId = $this->supplier_id;
 
+        // 2. Si hay proveedor, ejecutamos la consulta normalmente
         $catalog = Product::query()
+            ->where('supplier_id', $supplierId) // Filtro obligatorio ahora
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('sku', 'like', '%' . $this->search . '%');
-            })
-
-            ->when($supplierId, function ($query) use ($supplierId) {
-                $query->where('supplier_id', $supplierId);
             })
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->addSelect([
@@ -170,7 +165,7 @@ class Create extends Component
                         ->limit(1)
                 ]);
             })
-            ->paginate('16', pageName: 'products-page');
+            ->paginate(16, pageName: 'products-page');
 
         return view('livewire.admin.purchases.purchase-order.create', compact('catalog'));
     }

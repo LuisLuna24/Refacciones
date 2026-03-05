@@ -81,7 +81,8 @@
                                 </h3>
 
                                 <p class="text-[10px] text-gray-400 mt-1">
-                                    Costo Ref: ${{ number_format($item->cost ?? 0, 2) }}
+                                    Costo {{ $item->cost_package ? 'Paquete' : 'Unidad' }}:
+                                    ${{ number_format($item->cost_package ?? ($item->cost ?? 0), 2) }}
                                 </p>
                             </div>
 
@@ -132,12 +133,14 @@
 
                         <div
                             class="bg-emerald-50/50 dark:bg-gray-900 p-3 rounded-lg space-y-3 border border-emerald-100 dark:border-gray-700">
-                            <x-w-select label="Proveedor" wire:model="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name"
-                                option-value="id" :clearable="false" />
+                            <x-w-select label="Proveedor" placeholder="Seleccione un proveedor"
+                                wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name" option-value="id"
+                                :clearable="false" :disabled="count($products) > 0" />
 
                             <div class="grid grid-cols-2 gap-3">
-                                <x-w-select label="Almacén Destino" wire:model="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']"
-                                    option-label="name" option-value="id" :clearable="false" />
+                                <x-w-select label="Almacén Destino" placeholder="Seleccione un almacen"
+                                    wire:model="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']" option-label="name" option-value="id"
+                                    :clearable="false" />
                                 <x-w-input type="date" wire:model="date" label="Fecha" />
                             </div>
                         </div>
@@ -155,7 +158,7 @@
                             <div class="overflow-y-auto flex-1 p-2 space-y-2">
                                 <template x-for="(product, index) in products" :key="index">
                                     <div
-                                        class="grid grid-cols-12 gap-2 items-center bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
+                                        class="grid grid-cols-12 gap-2 items-start bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
 
                                         <div class="col-span-5">
                                             <div class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight"
@@ -164,19 +167,19 @@
                                         </div>
 
                                         <div class="col-span-2">
-                                            <x-w-input type="number" x-model.number="product.quantity" min="1"/>
+                                            <x-w-input type="number" x-model.number="product.quantity"
+                                                min="1" />
                                         </div>
 
                                         <div class="col-span-3 text-right">
-                                            <input type="number" x-model.number="product.price" step="0.01"
-                                                class="w-full h-8 text-right text-sm border-gray-300 rounded focus:ring-emerald-500 p-1 font-mono">
+                                            <x-w-input type="number" x-model.number="product.price" step="0.01" />
                                             <div class="text-[9px] text-gray-400 mt-0.5">
                                                 Tot: $<span
                                                     x-text="((parseFloat(product.quantity) || 0) * (parseFloat(product.price) || 0)).toFixed(2)"></span>
                                             </div>
                                         </div>
 
-                                        <div class="col-span-2 text-center">
+                                        <div class="col-span-2 text-center h-full flex justify-center items-center">
                                             <button type="button" @click="removeProduct(index)"
                                                 class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"

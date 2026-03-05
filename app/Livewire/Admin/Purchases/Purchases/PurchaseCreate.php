@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Purchases\Purchases;
 
-use App\Facades\kardex;
+use App\Facades\Kardex;
 use App\Models\Inventory; // Importante para la subconsulta de stock
 use App\Models\Product;
 use App\Models\Purchase;
@@ -94,7 +94,7 @@ class PurchaseCreate extends Component
         $product = Product::find($this->product_id);
 
         // Obtenemos el ÚLTIMO COSTO registrado para sugerirlo
-        $lastRecord = kardex::getLastRecord($product->id, $this->warehouse_id);
+        $lastRecord = Kardex::getLastRecord($product->id, $this->warehouse_id);
         $suggestedCost = $lastRecord['cost'] ?? $product->cost;
 
         $this->products[] = [
@@ -151,7 +151,7 @@ class PurchaseCreate extends Component
                 ]);
 
                 // Registro de Entrada en Kardex
-                kardex::registerEntry($purchase->id, Purchase::class, $product, $this->warehouse_id, 'Compra');
+                Kardex::registerEntry($purchase->id, Purchase::class, $product, $this->warehouse_id, 'Compra');
             }
 
             DB::commit();

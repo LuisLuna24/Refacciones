@@ -36,7 +36,7 @@ class Kardex extends Component
             })
             ->where('warehouse_id', $this->warehouse_id)->paginate(10, pageName: 'inventories-page');
 
-        return view('livewire.admin.inventories.products.kardex', [
+        return view('livewire.admin.inventories.products.Kardex', [
             'inventories' => $inventories
         ]);
     }

@@ -18,6 +18,8 @@ class Product extends Model
         'barcode',
         'price',
         'cost',
+        'cost_package',
+        'units_package',
         'category_id',
         'supplier_id',
         'stock',

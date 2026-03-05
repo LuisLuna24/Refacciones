@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Movements\Movements;
 
-use App\Facades\kardex;
+use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Movement;
 use App\Models\Product;
@@ -160,9 +160,9 @@ class MovementCreate extends Component
                 ]);
 
                 if ($this->type == 1) {
-                    kardex::registerEntry($movement->id, Movement::class, $product, $this->warehouse_id, 'Entrada');
+                    Kardex::registerEntry($movement->id, Movement::class, $product, $this->warehouse_id, 'Entrada');
                 } elseif ($this->type == 2) {
-                    kardex::registerExit($movement->id, Movement::class, $product, $this->warehouse_id, 'Salida');
+                    Kardex::registerExit($movement->id, Movement::class, $product, $this->warehouse_id, 'Salida');
                 }
             }
 

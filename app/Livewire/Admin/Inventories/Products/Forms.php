@@ -16,7 +16,10 @@ class Forms extends Component
 
     public $categories = [];
 
-    public $id, $name, $description, $barcode, $sku, $price = 0.00, $cost = 0.00, $category_id, $supplier_id;
+    public $id, $name, $description, $barcode, $sku, $price, $cost, $category_id, $supplier_id;
+    public $units_package;
+    public $cost_package;
+
 
     public function mount()
     {
@@ -30,6 +33,8 @@ class Forms extends Component
             $this->sku = $this->product->sku;
             $this->price = $this->product->price;
             $this->cost = $this->product->cost;
+            $this->units_package = $this->product->units_package;
+            $this->cost_package = $this->product->cost_package;
             $this->category_id = $this->product->category_id;
             $this->supplier_id = $this->product->supplier_id;
             $this->typeForm = 2;
@@ -40,6 +45,10 @@ class Forms extends Component
     {
         if (in_array($propertyName, ['cost', 'category_id'])) {
             $this->calculatePrice();
+        }
+
+        if (in_array($propertyName, ['cost_package', 'units_package', 'category_id'])) {
+            $this->calculatePricePakage();
         }
     }
 
@@ -59,6 +68,15 @@ class Forms extends Component
         }
     }
 
+    public function calculatePricePakage()
+    {
+        if ($this->cost_package > 0 && $this->units_package > 0) {
+            $cost_total = $this->cost_package / $this->units_package;
+            $this->cost = number_format($cost_total, 2, '.', '');
+            $this->calculatePrice();
+        }
+    }
+
     public function save()
     {
         $this->validate([
@@ -68,6 +86,8 @@ class Forms extends Component
             "sku" => ['nullable', 'string', 'max:50'],
             "price" => ['nullable', 'numeric', 'min:1'],
             "cost" => ['nullable', 'numeric', 'min:1'],
+            "units_package" => ['nullable', 'numeric', 'min:1'],
+            "cost_package" => ['nullable', 'numeric', 'min:1'],
             "category_id" => ['required', 'exists:categories,id'],
             "supplier_id" => ['required', 'exists:suppliers,id'],
         ], [], ['category_id' => 'catégoria', 'supplier_id' => 'proveedor']);
@@ -82,6 +102,8 @@ class Forms extends Component
                 'sku' => $this->sku,
                 'price' => $this->price,
                 'cost' => $this->cost,
+                'units_package' => $this->units_package,
+                'cost_package' => $this->cost_package,
                 'porcent' => $this->porcent,
                 'category_id' => $this->category_id,
                 'supplier_id' => $this->supplier_id
@@ -98,6 +120,8 @@ class Forms extends Component
                     'sku',
                     'price',
                     'cost',
+                    'units_package',
+                    'cost_package',
                     'porcent',
                     'category_id',
                     'supplier_id'

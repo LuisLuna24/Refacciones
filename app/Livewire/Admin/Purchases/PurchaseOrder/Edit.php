@@ -82,15 +82,14 @@ class Edit extends Component
         }
 
         $product = Product::find($this->product_id);
-        $lastRecord = Kardex::getLastRecord($product->id, $this->warehouse_id);
 
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
             'sku' => $product->sku ?? '',
-            'price' => $lastRecord['cost'] ?? $product->cost,
+            'price' => $product->cost_package ?? $product->cost,
             'quantity' => 1,
-            'subtotal' => $lastRecord['cost'] ?? $product->cost,
+            'subtotal' => $product->cost_package ?? $product->cost,
         ];
 
         $this->reset(['product_id', 'search']);

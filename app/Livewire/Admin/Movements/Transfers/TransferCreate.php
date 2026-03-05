@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Movements\Transfers;
 
-use App\Facades\kardex;
+use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Transfer;
@@ -160,9 +160,9 @@ class TransferCreate extends Component
                 ]);
 
                 // Salida de Origen
-                kardex::registerExit($transfer->id, Transfer::class, $product, $this->origin_warehouse_id, 'Transferencia Salida');
+                Kardex::registerExit($transfer->id, Transfer::class, $product, $this->origin_warehouse_id, 'Transferencia Salida');
                 // Entrada a Destino
-                kardex::registerEntry($transfer->id, Transfer::class, $product, $this->destination_warehouse_id, 'Transferencia Entrada');
+                Kardex::registerEntry($transfer->id, Transfer::class, $product, $this->destination_warehouse_id, 'Transferencia Entrada');
             }
 
             DB::commit();

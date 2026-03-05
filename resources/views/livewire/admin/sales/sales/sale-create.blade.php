@@ -23,7 +23,7 @@
                     <div class="w-full">
                         <h2 class="text-xl font-bold text-gray-700 dark:text-gray-200 mb-3">Productos</h2>
                         <x-w-select label="Categoria" placeholder="Todas las categorias" wire:model.live="category_id"
-                            :async-data="['api' => route('api.categories.index'), 'method' => 'POST']" option-label="name" option-value="id"/>
+                            :async-data="['api' => route('api.categories.index'), 'method' => 'POST']" option-label="name" option-value="id" />
                     </div>
 
                     <div class="relative w-full max-w-md">
@@ -49,11 +49,30 @@
                             $hasWarehouse = !empty($warehouse_id);
                         @endphp
 
+                        @php
+                            // Suponiendo que guardas los productos en un array de IDs o colección
+                            // Ajusta 'selectedProducts' al nombre real de tu variable en el componente
+                            $isAdded = collect($products)->contains('id', $item->id);
+                        @endphp
+
                         <div wire:key="prod-{{ $item->id }}"
                             @if ($hasStock && $hasWarehouse) wire:click="addFromCard({{ $item->id }})"
-                                class="group relative bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-xl p-3 shadow-sm hover:shadow-md hover:border-primary-500 cursor-pointer transition-all active:scale-95 flex flex-col justify-between h-full"
-                            @else
-                                class="relative bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 cursor-not-allowed opacity-75 flex flex-col justify-between h-full" @endif>
+        class="group relative bg-white dark:bg-gray-800 border {{ $isAdded ? 'border-green-500 shadow-sm' : 'dark:border-gray-700' }} rounded-xl p-3 shadow-sm hover:shadow-md hover:border-primary-500 cursor-pointer transition-all active:scale-95 flex flex-col justify-between h-full"
+    @else
+        class="relative bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-3 cursor-not-allowed opacity-75 flex flex-col justify-between h-full" @endif>
+
+                            @if ($isAdded)
+                                <div class="absolute -top-2 -right-2 z-20">
+                                    <span
+                                        class="flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-white shadow-sm ring-2 ring-white dark:ring-gray-800">
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </span>
+                                </div>
+                            @endif
+
                             <div>
                                 <div class="flex justify-between items-start mb-2">
                                     <span
@@ -100,10 +119,19 @@
                                     class="absolute inset-0 flex items-center justify-center bg-primary-600/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl pointer-events-none">
                                     <span
                                         class="bg-primary-600 text-white rounded-full p-1.5 shadow-lg transform scale-0 group-hover:scale-100 transition-transform duration-200">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 4v16m8-8H4"></path>
-                                        </svg>
+                                        @if ($isAdded)
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                        @else
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                        @endif
                                     </span>
                                 </div>
                             @endif
@@ -140,45 +168,46 @@
                     </div>
 
                     <div
-                        class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col h-[300px]">
+                        class="border border-emerald-100 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col h-[350px] bg-white dark:bg-gray-800">
                         <div
-                            class="grid grid-cols-12 gap-2 bg-gray-100 dark:bg-gray-800 p-2 text-xs font-bold text-gray-500 uppercase">
-                            <div class="col-span-6">Concepto</div>
+                            class="grid grid-cols-12 gap-2 p-2 text-xs font-bold uppercase border-b bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300">
+                            <div class="col-span-5">Producto</div>
                             <div class="col-span-2 text-center">Cant.</div>
-                            <div class="col-span-3 text-right">Total</div>
-                            <div class="col-span-1"></div>
+                            <div class="col-span-3 text-right">Costo</div>
+                            <div class="col-span-2"></div>
                         </div>
 
                         <div class="overflow-y-auto flex-1 p-2 space-y-2">
                             <template x-for="(product, index) in products" :key="index">
                                 <div
-                                    class="grid grid-cols-12 gap-2 items-center bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
+                                    class="grid grid-cols-12 gap-2 items-start bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
 
-                                    <div class="col-span-6">
+                                    <div class="col-span-5">
                                         <div class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight"
                                             x-text="product.name"></div>
-                                        <input type="number" x-model.number="product.price" step="0.01"
-                                            class="w-20 mt-1 h-6 text-xs border-0 border-b border-gray-200 bg-transparent focus:ring-0 p-0 text-blue-600 font-semibold"
-                                            placeholder="Precio">
+                                        <div class="text-[9px] text-gray-400" x-text="product.sku"></div>
                                     </div>
 
                                     <div class="col-span-2">
-                                        <x-w-input type="number" x-model.number="product.quantity" min="1"/>
+                                        <x-w-input type="number" x-model.number="product.quantity" min="1" />
                                     </div>
 
-                                    <div
-                                        class="col-span-3 text-right font-bold text-gray-700 dark:text-gray-300 text-sm">
-                                        $<span
-                                            x-text="((product.quantity || 0) * (product.price || 0)).toFixed(2)"></span>
+                                    <div class="col-span-3 text-right">
+                                        <x-w-input type="number" x-model.number="product.price" step="0.01" />
+                                        <div class="text-[9px] text-gray-400 mt-0.5">
+                                            Tot: $<span
+                                                x-text="((parseFloat(product.quantity) || 0) * (parseFloat(product.price) || 0)).toFixed(2)"></span>
+                                        </div>
                                     </div>
 
-                                    <div class="col-span-1 text-center">
+                                    <div class="col-span-2 text-center h-full flex justify-center items-center">
                                         <button type="button" @click="removeProduct(index)"
-                                            class="text-red-400 hover:text-red-600">
+                                            class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
                                             </svg>
                                         </button>
                                     </div>
@@ -195,13 +224,12 @@
                     <div
                         class="bg-gray-50 dark:bg-gray-900 p-4 rounded-xl space-y-4 border border-gray-100 dark:border-gray-700">
 
-                        <x-w-select label="Cliente" placeholder="Buscar cliente..." wire:model.live="customer_id"
+                        <x-w-select label="Cliente" placeholder="Publico en general" wire:model.live="customer_id"
                             :async-data="['api' => route('api.customers.index'), 'method' => 'POST']" option-label="name" option-value="id" />
 
-                        @if ($customer_id)
-                            <x-w-select label="Cotización" placeholder="Seleccione un cotización"
-                                wire:model.live="quote_id" :async-data="['api' => route('api.quotes.index'), 'method' => 'POST']" option-label="name" option-value="id" />
-                        @endif
+                        <x-w-select label="Cotización" placeholder="Seleccione un cotización"
+                            wire:model.live="quote_id" :async-data="['api' => route('api.quotes.index'), 'method' => 'POST']" option-label="name" option-value="id" />
+
 
                         <div class="flex justify-between items-end border-t pt-4 dark:border-gray-700">
                             <div>

@@ -109,8 +109,9 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div class="col-span-1 md:col-span-2">
-                            <x-w-select label="Proveedor *" placeholder="Seleccionar proveedor"
-                                wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name" option-value="id" />
+                            <x-w-select label="Proveedor" placeholder="Seleccione un proveedor"
+                                wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name" option-value="id"
+                                :clearable="false" :disabled="count($products) > 0" />
                         </div>
 
                         <x-w-select label="Almacén Destino *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']"
@@ -129,53 +130,49 @@
                     </div>
 
                     <div
-                        class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-gray-50 dark:bg-gray-900 flex flex-col h-[300px]">
+                        class="border border-emerald-100 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col h-[350px] bg-white dark:bg-gray-800">
                         <div
-                            class="grid grid-cols-12 gap-2 bg-gray-100 dark:bg-gray-800 p-2 text-xs font-bold text-gray-500 uppercase">
-                            <div class="col-span-6">Concepto</div>
+                            class="grid grid-cols-12 gap-2 p-2 text-xs font-bold uppercase border-b bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300">
+                            <div class="col-span-5">Producto</div>
                             <div class="col-span-2 text-center">Cant.</div>
-                            <div class="col-span-3 text-right">Total</div>
-                            <div class="col-span-1"></div>
+                            <div class="col-span-3 text-right">Costo</div>
+                            <div class="col-span-2"></div>
                         </div>
 
                         <div class="overflow-y-auto flex-1 p-2 space-y-2">
                             <template x-for="(product, index) in products" :key="index">
                                 <div
-                                    class="grid grid-cols-12 gap-2 items-center bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
+                                    class="grid grid-cols-12 gap-2 items-start bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
 
-                                    <div class="col-span-6">
+                                    <div class="col-span-5">
                                         <div class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight"
                                             x-text="product.name"></div>
-                                        <input type="number" x-model.number="product.price" step="0.01"
-                                            class="w-20 mt-1 h-6 text-xs border-0 border-b border-gray-200 bg-transparent focus:ring-0 p-0 text-blue-600 font-semibold"
-                                            placeholder="Precio">
+                                        <div class="text-[9px] text-gray-400" x-text="product.sku"></div>
                                     </div>
 
                                     <div class="col-span-2">
-                                        <x-w-input type="number" x-model.number="product.quantity" min="1"/>
+                                        <x-w-input type="number" x-model.number="product.quantity" min="1" />
                                     </div>
 
-                                    <div
-                                        class="col-span-3 text-right font-bold text-gray-700 dark:text-gray-300 text-sm">
-                                        $<span
-                                            x-text="((product.quantity || 0) * (product.price || 0)).toFixed(2)"></span>
+                                    <div class="col-span-3 text-right">
+                                        <x-w-input type="number" x-model.number="product.price" step="0.01" />
+                                        <div class="text-[9px] text-gray-400 mt-0.5">
+                                            Tot: $<span
+                                                x-text="((parseFloat(product.quantity) || 0) * (parseFloat(product.price) || 0)).toFixed(2)"></span>
+                                        </div>
                                     </div>
 
-                                    <div class="col-span-1 text-center">
+                                    <div class="col-span-2 text-center h-full flex justify-center items-center">
                                         <button type="button" @click="removeProduct(index)"
-                                            class="text-red-400 hover:text-red-600">
+                                            class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M6 18L18 6M6 6l12 12"></path>
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
                                             </svg>
                                         </button>
                                     </div>
-                                </div>
-                            </template>
-                            <template x-if="products.length === 0">
-                                <div class="h-full flex flex-col items-center justify-center text-gray-400 opacity-60">
-                                    <span class="text-xs italic">Agrega productos del catálogo</span>
                                 </div>
                             </template>
                         </div>

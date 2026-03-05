@@ -39,10 +39,7 @@ class Dashboard extends Component
 
         // 5. Últimas Ventas (Para la tabla)
         // Usamos 'with' para cargar la relación del cliente y evitar consultas N+1
-        $recentSales = Sale::with('client')
-            ->latest() // Ordenar por fecha descendente
-            ->take(5)  // Solo las últimas 5
-            ->get();
+        $recentSales = 0;
 
         return view('livewire.admin.dashboard', [
             'dailyEarnings' => $dailyEarnings,

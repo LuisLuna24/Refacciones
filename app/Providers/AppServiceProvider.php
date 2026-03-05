@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind('kardex', function ($app) {
+        $this->app->bind('Kardex', function ($app) {
             return new \App\Services\KardexService();
         });
     }

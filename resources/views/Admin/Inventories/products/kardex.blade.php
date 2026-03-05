@@ -20,6 +20,6 @@
         </div>
     </div>
 
-    @livewire('admin.inventories.products.kardex', ['product' => $product])
+    @livewire('admin.inventories.products.Kardex', ['product' => $product])
 
 </x-admin-layout>

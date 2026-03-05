@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Sales\Sales;
 
-use App\Facades\kardex;
+use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Quote;
@@ -99,6 +99,7 @@ class SaleCreate extends Component
             'id' => $product->id,
             'name' => $product->name,
             'price' => $product->price,
+            'sku' => $product->sku,
             'quantity' => 1,
             'subtotal' => $product->price,
         ];
@@ -152,7 +153,7 @@ class SaleCreate extends Component
                 ]);
 
                 // Registro en Kardex usando tu Facade/Clase
-                kardex::registerExit($sale->id, Sale::class, $product, $this->warehouse_id, 'Venta');
+                Kardex::registerExit($sale->id, Sale::class, $product, $this->warehouse_id, 'Venta');
             }
 
             DB::commit();
@@ -179,23 +180,28 @@ class SaleCreate extends Component
         $warehouseId = $this->warehouse_id;
 
         $catalog = Product::query()
-            // 1. Filtro de búsqueda (Agrupado para no romper otros filtros)
+            ->select('products.*')
+
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('sku', 'like', '%' . $this->search . '%');
             })
+
             ->when($this->category_id, function ($query) {
                 $query->where('category_id', $this->category_id);
             })
+
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->addSelect([
                     'stock' => Inventory::select('quantity_balance')
                         ->whereColumn('product_id', 'products.id')
                         ->where('warehouse_id', $warehouseId)
-                        ->orderBy('id', 'desc')
+                        ->orderBy('id', 'desc') // Trae el último movimiento de inventario
                         ->limit(1)
                 ]);
+                $query->orderBy('stock', 'desc');
             })
+
             ->with('category')
             ->paginate(16, pageName: 'products-page');
 

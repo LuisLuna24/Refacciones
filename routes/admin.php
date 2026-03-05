@@ -36,7 +36,7 @@ Route::get('/products/import', [ProductController::class, 'import'])->name('prod
 
 //========== Kardex
 
-Route::get('products/{product}/kardex', [ProductController::class, 'kardex'])->name('products.kardex');
+Route::get('products/{product}/Kardex', [ProductController::class, 'Kardex'])->name('products.Kardex');
 
 //========== Customers
 Route::resource('customers', CustomerController::class)->only('index', 'create', 'edit','destroy');

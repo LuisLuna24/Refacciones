@@ -8,6 +8,6 @@ class Kardex extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return "kardex";
+        return "Kardex";
     }
 }
