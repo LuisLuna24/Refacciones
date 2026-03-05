@@ -86,10 +86,10 @@ class Edit extends Component
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
+            'price' => $product->cost,
+            'quantity' => $product->cost_package > 0 ? $product->units_package : 1,
+            'subtotal' => $product->cost,
             'sku' => $product->sku ?? '',
-            'price' => $product->cost_package ?? $product->cost,
-            'quantity' => 1,
-            'subtotal' => $product->cost_package ?? $product->cost,
         ];
 
         $this->reset(['product_id', 'search']);

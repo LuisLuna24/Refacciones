@@ -93,16 +93,12 @@ class PurchaseCreate extends Component
 
         $product = Product::find($this->product_id);
 
-        // Obtenemos el ÚLTIMO COSTO registrado para sugerirlo
-        $lastRecord = Kardex::getLastRecord($product->id, $this->warehouse_id);
-        $suggestedCost = $lastRecord['cost'] ?? $product->cost;
-
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $suggestedCost, // Importante: Sugerimos el costo, no el precio de venta
+            'price' => $product->cost, // Importante: Sugerimos el costo, no el precio de venta
             'quantity' => 1,
-            'subtotal' => $suggestedCost,
+            'subtotal' => $product->cost,
             'sku' => $product->sku ?? '',
         ];
 
