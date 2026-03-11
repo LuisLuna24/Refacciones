@@ -21,7 +21,7 @@ class PurcharseOrderTable extends DataTableComponent
 
         $this->setConfigurableAreas([
             'after-wrapper' => [
-                'Admin.Pdf.modal',
+                'Admin.Purchases.purchase_orders.modals',
             ]
         ]);
     }
@@ -101,7 +101,7 @@ class PurcharseOrderTable extends DataTableComponent
         $this->form['open'] = true;
         $this->form['document'] = $model->serie . $model->correlative;
         $this->form['addressee'] = $model->supplier->name;
-        $this->form['email'] = $model->supplier->email;
+        $this->form['email'] = $model->supplier->email ?? '';
         $this->form['model'] = $model;
 
 
@@ -132,6 +132,22 @@ class PurcharseOrderTable extends DataTableComponent
                 'text' => 'Lo sentimos ha ocurrido un error intente mas tarde'
             ]);
         }
+    }
+
+    public $modalProductsSale = false;
+    public $prouctsSale = [];
+
+    public function openModalProducts($id)
+    {
+        $this->modalProductsSale = true;
+
+        $this->prouctsSale = PurchaseOrder::find($id)->products;
+    }
+
+    public function closeModalProducts()
+    {
+        $this->modalProductsSale = false;
+        $this->reset('prouctsSale');
     }
 }
 

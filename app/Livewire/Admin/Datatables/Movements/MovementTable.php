@@ -21,7 +21,7 @@ class MovementTable extends DataTableComponent
 
         $this->setConfigurableAreas([
             'after-wrapper' => [
-                'Admin.Pdf.modal',
+                'Admin.Movements.movements.modals',
             ]
         ]);
     }
@@ -133,5 +133,21 @@ class MovementTable extends DataTableComponent
                 'text' => 'Lo sentimos ha ocurrido un error intente mas tarde'
             ]);
         }
+    }
+
+    public $modalProductsSale = false;
+    public $prouctsSale = [];
+
+    public function openModalProducts($id)
+    {
+        $this->modalProductsSale = true;
+
+        $this->prouctsSale = Movement::find($id)->products;
+    }
+
+    public function closeModalProducts()
+    {
+        $this->modalProductsSale = false;
+        $this->reset('prouctsSale');
     }
 }

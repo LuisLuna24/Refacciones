@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Datatables\Sales;
 
 use App\Mail\PdfSend;
+use App\Models\Product;
 use App\Models\Sale;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -21,12 +22,12 @@ class SaleTable extends DataTableComponent
 
         $this->setConfigurableAreas([
             'after-wrapper' => [
-                'Admin.Pdf.modal',
+                'Admin.Sales.sales.modals',
             ]
         ]);
     }
 
-     //=====================Filtors
+    //=====================Filtors
 
     public function filters(): array
     {
@@ -108,10 +109,8 @@ class SaleTable extends DataTableComponent
         $this->form['open'] = true;
         $this->form['document'] = $model->serie . $model->correlative;
         $this->form['addressee'] = $model->customer?->name ?? 'Cliente sin registrar';
-        $this->form['email'] = $model->customer->email;
+        $this->form['email'] = $model->customer->email ?? '';
         $this->form['model'] = $model;
-
-
     }
 
     public function sendEmail()
@@ -139,5 +138,21 @@ class SaleTable extends DataTableComponent
                 'text' => 'Lo sentimos ha ocurrido un error intente mas tarde'
             ]);
         }
+    }
+
+    public $modalProductsSale = false;
+    public $prouctsSale = [];
+
+    public function openModalProducts($id)
+    {
+        $this->modalProductsSale = true;
+
+        $this->prouctsSale = Sale::find($id)->products;
+    }
+
+    public function closeModalProducts()
+    {
+        $this->modalProductsSale = false;
+        $this->reset('prouctsSale');
     }
 }

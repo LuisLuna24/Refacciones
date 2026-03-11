@@ -7,4 +7,7 @@
     <x-w-button blue href="{{ route('admin.sales.pdf', $sale) }}">
         {!! file_get_contents(public_path('svg/file-type-pdf.svg')) !!}
     </x-w-button>
+    <x-w-button blue wire:click="openModalProducts({{ $sale->id }})">
+        {!! file_get_contents(public_path('svg/list-check.svg')) !!}
+    </x-w-button>
 </div>

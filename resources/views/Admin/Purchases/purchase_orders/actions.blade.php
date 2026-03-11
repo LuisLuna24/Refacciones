@@ -14,4 +14,7 @@
             {!! file_get_contents(public_path('svg/edit.svg')) !!}
         </x-w-button>
     @endcan
+    <x-w-button blue wire:click="openModalProducts({{ $purchaseOrder->id }})">
+        {!! file_get_contents(public_path('svg/list-check.svg')) !!}
+    </x-w-button>
 </div>
