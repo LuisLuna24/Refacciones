@@ -30,7 +30,7 @@ class SaleController extends Controller
 
     public function pdf(Sale $sale)
     {
-        $pdf = Pdf::loadView('admin.sales.sales.pdf', [
+        $pdf = Pdf::loadView('Admin.Sales.sales.pdf', [
             'model' => $sale,
         ]);
 

@@ -30,7 +30,7 @@ class TransferController extends Controller
 
      public function pdf(Transfer $transfer)
     {
-        $pdf = Pdf::loadView('admin.movements.transfers.pdf', [
+        $pdf = Pdf::loadView('Admin.Movements.transfers.pdf', [
             'model' => $transfer,
         ]);
 

@@ -29,7 +29,7 @@ class QuoteController extends Controller
 
     public function pdf(Quote $quote)
     {
-        $pdf = Pdf::loadView('admin.sales.quotes.pdf', [
+        $pdf = Pdf::loadView('Admin.Sales.quotes.pdf', [
             'model' => $quote,
         ]);
 

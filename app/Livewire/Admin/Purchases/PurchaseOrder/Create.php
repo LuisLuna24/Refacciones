@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Purchases\PurchaseOrder;
 
 use App\Facades\Kardex;
-use App\Models\Inventory; // Necesario para consultar stock
+use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 class Create extends Component
 {
     use WithPagination;
+
     // Filtros
     public $search = '';
 
@@ -79,13 +80,25 @@ class Create extends Component
 
         $product = Product::find($this->product_id);
 
+        // Lógica para determinar si usa paquetes y establecer precios
+        $hasPackages = $product->cost_package > 0;
+        $defaultType = $hasPackages ? 'package' : 'unit';
+        $defaultPrice = $hasPackages ? $product->cost_package : $product->cost;
+
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $product->cost,
-            'quantity' => $product->cost_package > 0 ? $product->units_package : 1,
-            'subtotal' => $product->cost,
             'sku' => $product->sku ?? '',
+            // Datos para AlpineJS
+            'has_packages' => $hasPackages,
+            'purchase_type' => $defaultType,
+            'unit_price' => $product->cost,
+            'package_price' => $product->cost_package,
+            'units_per_package' => $product->units_package ?? 1,
+            // Datos del carrito
+            'price' => $defaultPrice,
+            'quantity' => 1,
+            'subtotal' => $defaultPrice,
         ];
 
         $this->reset(['product_id', 'search']);
@@ -118,6 +131,12 @@ class Create extends Component
             ]);
 
             foreach ($this->products as $product) {
+                // Cantidad real para el Kardex (si decides integrarlo aquí en el futuro)
+                $realPhysicalQuantity = $product['purchase_type'] === 'package'
+                    ? ($product['quantity'] * $product['units_per_package'])
+                    : $product['quantity'];
+
+                // Guardamos en la orden de compra cómo se compró comercialmente
                 $purchaseOrder->products()->attach($product['id'], [
                     'quantity' => $product['quantity'],
                     'price' => $product['price'],
@@ -149,9 +168,8 @@ class Create extends Component
         $warehouseId = $this->warehouse_id;
         $supplierId = $this->supplier_id;
 
-        // 2. Si hay proveedor, ejecutamos la consulta normalmente
         $catalog = Product::query()
-            ->where('supplier_id', $supplierId) // Filtro obligatorio ahora
+            ->where('supplier_id', $supplierId)
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('sku', 'like', '%' . $this->search . '%');

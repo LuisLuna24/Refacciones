@@ -5,7 +5,6 @@
         this.products.splice(index, 1)
     },
     init() {
-        // Un solo watcher para recalcular todo
         this.$watch('products', (newProducts) => {
             let total = 0;
             newProducts.forEach(product => {
@@ -43,7 +42,6 @@
                     @forelse($catalog as $item)
                         @php
                             $stock = intval($item->stock ?? 0);
-                            // Verificamos si ya está en la lista de productos actual
                             $inOrder = collect($products)->contains('id', $item->id);
                         @endphp
 
@@ -81,8 +79,8 @@
                                 </h3>
 
                                 <p class="text-[10px] text-gray-400 mt-1">
-                                    Costo {{ $item->cost_package ? 'Paquete' : 'Unidad' }}:
-                                    ${{ number_format($item->cost_package ?? ($item->cost ?? 0), 2) }}
+                                    Costo {{ $item->cost_package > 0 ? 'Paquete' : 'Unidad' }}:
+                                    ${{ number_format($item->cost_package > 0 ? $item->cost_package : $item->cost, 2) }}
                                 </p>
                             </div>
 
@@ -149,10 +147,11 @@
                             class="border border-emerald-100 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col h-[350px] bg-white dark:bg-gray-800">
                             <div
                                 class="grid grid-cols-12 gap-2 p-2 text-xs font-bold uppercase border-b bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300">
-                                <div class="col-span-5">Producto</div>
+                                <div class="col-span-4">Producto</div>
+                                <div class="col-span-2">Tipo</div>
                                 <div class="col-span-2 text-center">Cant.</div>
                                 <div class="col-span-3 text-right">Costo</div>
-                                <div class="col-span-2"></div>
+                                <div class="col-span-1"></div>
                             </div>
 
                             <div class="overflow-y-auto flex-1 p-2 space-y-2">
@@ -160,10 +159,22 @@
                                     <div
                                         class="grid grid-cols-12 gap-2 items-start bg-white dark:bg-gray-800 p-2 rounded shadow-sm border border-gray-100 dark:border-gray-700">
 
-                                        <div class="col-span-5">
+                                        <div class="col-span-4">
                                             <div class="text-xs font-bold text-gray-800 dark:text-gray-200 leading-tight"
                                                 x-text="product.name"></div>
                                             <div class="text-[9px] text-gray-400" x-text="product.sku"></div>
+                                        </div>
+
+                                        <div class="col-span-2">
+                                            <template x-if="product.has_packages">
+                                                <select x-model="product.purchase_type" @change="product.price = product.purchase_type === 'package' ? product.package_price : product.unit_price">
+                                                    <option value="unit">Unidad</option>
+                                                    <option value="package">Paquete</option>
+                                                </select>
+                                            </template>
+                                            <template x-if="!product.has_packages">
+                                                <span class="text-[10px] text-gray-500 mt-2 block">Unidad</span>
+                                            </template>
                                         </div>
 
                                         <div class="col-span-2">
@@ -179,10 +190,9 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-span-2 text-center h-full flex justify-center items-center">
-                                            <button type="button" @click="removeProduct(index)"
-                                                class="text-red-400 hover:text-red-600 hover:bg-red-50 p-1 rounded transition-colors">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                        <div class="col-span-1 text-center h-full flex justify-center items-center">
+                                            <button type="button" @click="removeProduct(index)">
+                                                <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"

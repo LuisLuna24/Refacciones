@@ -32,7 +32,7 @@ class PurchaseController extends Controller
     public function pdf(Purchase $purchase)
     {
 
-        $pdf = Pdf::loadView('admin.purchases.purchases.pdf', [
+        $pdf = Pdf::loadView('Admin.Purchases.purchases.pdf', [
             'model' => $purchase,
         ]);
 
