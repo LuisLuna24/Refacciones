@@ -1,4 +1,5 @@
 <div>
+    <!--x-w-button>Actualizar precios</-x-w-button-->
     <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <div
             class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 border-l-4 border-green-500 transition-colors duration-200">

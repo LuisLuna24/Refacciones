@@ -23,6 +23,7 @@ class Product extends Model
         'category_id',
         'supplier_id',
         'stock',
+        'apply_iva'
     ];
 
     //Accesores

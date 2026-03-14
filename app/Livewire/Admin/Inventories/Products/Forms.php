@@ -20,6 +20,12 @@ class Forms extends Component
     public $units_package;
     public $cost_package;
 
+    public $porcent = 0;
+
+    public $iva = 16;
+
+    // NUEVA PROPIEDAD: Controla si se aplica o no el IVA
+    public bool $apply_iva = true;
 
     public function mount()
     {
@@ -37,23 +43,23 @@ class Forms extends Component
             $this->cost_package = $this->product->cost_package;
             $this->category_id = $this->product->category_id;
             $this->supplier_id = $this->product->supplier_id;
+            $this->apply_iva = $this->product->apply_iva;
+
             $this->typeForm = 2;
         }
     }
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['cost', 'category_id'])) {
+        // Agregamos 'apply_iva' para que recalcule al hacer clic en el checkbox
+        if (in_array($propertyName, ['cost', 'category_id', 'apply_iva'])) {
             $this->calculatePrice();
         }
 
-        if (in_array($propertyName, ['cost_package', 'units_package', 'category_id'])) {
+        if (in_array($propertyName, ['cost_package', 'units_package', 'category_id', 'apply_iva'])) {
             $this->calculatePricePakage();
         }
     }
-
-    public $porcent = 0;
-
 
     public function calculatePrice()
     {
@@ -61,10 +67,25 @@ class Forms extends Component
             $category = Category::find($this->category_id);
             $this->porcent = $category ? $category->porcent : 0;
 
-            $total = floatval($this->cost) + (floatval($this->cost) * floatval($this->porcent) / 100);
-            $this->price = number_format($total, 2, '.', '');
+            // 1. Subtotal (Costo + Ganancia)
+            $subtotal = floatval($this->cost) + (floatval($this->cost) * floatval($this->porcent) / 100);
+
+            // 2. Aplicar IVA solo si el checkbox está activo
+            if ($this->apply_iva) {
+                $total_final = $subtotal * (1 + ($this->iva / 100));
+            } else {
+                $total_final = $subtotal;
+            }
+
+            // 3. Formato
+            $this->price = number_format($total_final, 2, '.', '');
         } else {
-            $this->price = $this->cost;
+            // Si no hay categoría pero sí costo y queremos aplicar IVA al costo base
+            if ($this->apply_iva && $this->cost > 0) {
+                $this->price = number_format(floatval($this->cost) * (1 + ($this->iva / 100)), 2, '.', '');
+            } else {
+                $this->price = $this->cost;
+            }
         }
     }
 
@@ -90,7 +111,8 @@ class Forms extends Component
             "cost_package" => ['nullable', 'numeric', 'min:1'],
             "category_id" => ['required', 'exists:categories,id'],
             "supplier_id" => ['required', 'exists:suppliers,id'],
-        ], [], ['category_id' => 'catégoria', 'supplier_id' => 'proveedor']);
+            "apply_iva" => ['boolean'], // Validamos el boolean
+        ], [], ['category_id' => 'categoría', 'supplier_id' => 'proveedor']);
 
         DB::beginTransaction();
         try {
@@ -105,6 +127,7 @@ class Forms extends Component
                 'units_package' => $this->units_package,
                 'cost_package' => $this->cost_package,
                 'porcent' => $this->porcent,
+                'apply_iva' => $this->apply_iva, // Descomenta si lo agregas a tu BD
                 'category_id' => $this->category_id,
                 'supplier_id' => $this->supplier_id
             ]);
@@ -124,18 +147,19 @@ class Forms extends Component
                     'cost_package',
                     'porcent',
                     'category_id',
-                    'supplier_id'
+                    'supplier_id',
+                    'apply_iva' // Reseteamos el checkbox al crear
                 ]);
             }
 
             DB::commit();
-            $this->dispatch('swal', ['icon' => 'success', 'title' => 'Exito', 'text' => $text]);
+            $this->dispatch('swal', ['icon' => 'success', 'title' => 'Éxito', 'text' => $text]);
         } catch (\Exception $e) {
-            dd($e->getMessage());
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => 'Lo sentimos ha ocurrido un error inesperado.']);
             DB::rollBack();
         }
     }
+
     public function render()
     {
         return view('livewire.admin.inventories.products.forms');

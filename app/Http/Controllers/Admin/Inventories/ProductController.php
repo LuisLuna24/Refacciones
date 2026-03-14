@@ -77,7 +77,7 @@ class ProductController extends Controller
 
     public function Kardex(Product $product)
     {
-        return view('Admin.Inventories.products.Kardex', compact('product'));
+        return view('Admin.Inventories.products.kardex', compact('product'));
     }
 
     public function show()

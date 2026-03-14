@@ -24,18 +24,25 @@
             <section class="space-y-4">
                 <h3 class="text-lg font-medium border-b pb-2">Finanzas y Organización</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
                     <x-w-input type="number" label="Costo paquete" wire:model.live="cost_package" placeholder="0.00"
                         step="0.01" hint="Lo que te cuesta a ti por paquete" />
 
-                    <x-w-input type="number" label="Unidades por paquete" wire:model.live="units_package" placeholder="0"
-                        step="1" hint="Unidades que vienen por paquete" />
+                    <x-w-input type="number" label="Unidades por paquete" wire:model.live="units_package"
+                        placeholder="0" step="1" hint="Unidades que vienen por paquete" />
 
                     <x-w-input type="number" label="Costo" wire:model.live="cost" placeholder="0.00" step="0.01"
                         hint="Lo que te cuesta a ti por unidad" />
 
-                    <x-w-input type="number" label="Precio de Venta" wire:model="price" placeholder="0.00"
-                        step="0.01" hint="Precio final calculado" />
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center space-x-2 pt-2">
+                            <x-w-toggle wire:model.live="apply_iva"
+                                label="Aplicar IVA ({{ $iva }}%) al Precio de Venta" />
+                        </div>
+
+                        <x-w-input type="number" label="Precio de Venta" wire:model="price" placeholder="0.00"
+                            step="0.01" hint="Precio final calculado (con o sin IVA)" />
+                    </div>
 
                     <x-w-select label="Categoría" placeholder="Seleccione" wire:model.live="category_id"
                         :options="$categories" option-label="name" option-value="id" />
