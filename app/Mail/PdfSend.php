@@ -42,7 +42,8 @@ class PdfSend extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.pdf-send',
+            // Cambiamos 'markdown' por 'view'
+            view: 'emails.pdf-send',
             with: ['form' => $this->form]
         );
     }
@@ -57,7 +58,7 @@ class PdfSend extends Mailable
         $pdf = Pdf::loadView($this->form['view_pdf_patch'], ['model' => $this->form['model']])->output();
 
         return [
-            Attachment::fromData(fn() => $pdf, 'pdf','document.pdf')->withMime('application/pdf'),
+            Attachment::fromData(fn() => $pdf, 'pdf', 'document.pdf')->withMime('application/pdf'),
         ];
     }
 }
