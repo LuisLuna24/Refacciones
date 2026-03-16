@@ -156,6 +156,14 @@ class SaleCreate extends Component
                 Kardex::registerExit($sale->id, Sale::class, $product, $this->warehouse_id, 'Venta');
             }
 
+            if ($this->quote_id) {
+                $purchase = Quote::findOrFail($this->quote_id);
+
+                $purchase->update([
+                    'status' => 1,
+                ]);
+            }
+
             DB::commit();
 
             session()->flash('swal', [

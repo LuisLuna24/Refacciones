@@ -110,6 +110,7 @@ Route::post('purchase-orders', function (Request $request) {
                 $query->limit(10);
             }
         )
+        ->where('status', 0)
         ->with('supplier')
         ->orderBy('id', 'desc')
         ->get();
@@ -182,6 +183,7 @@ Route::post('quotes', function (Request $request) {
                 $query->limit(10);
             }
         )
+        ->where('status', 0)
         ->with('customer')
         ->orderBy('id', 'desc')
         ->get();
@@ -238,5 +240,3 @@ Route::post('/categories', function (Request $request) {
         ->orderBy('name')
         ->get();
 })->name('api.categories.index');
-
-

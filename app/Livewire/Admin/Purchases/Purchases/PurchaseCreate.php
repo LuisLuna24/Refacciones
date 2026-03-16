@@ -137,6 +137,7 @@ class PurchaseCreate extends Component
                 'observation' => $this->observation,
             ]);
 
+
             foreach ($this->products as $product) {
                 $subtotal = $product['quantity'] * $product['price'];
 
@@ -148,6 +149,14 @@ class PurchaseCreate extends Component
 
                 // Registro de Entrada en Kardex
                 Kardex::registerEntry($purchase->id, Purchase::class, $product, $this->warehouse_id, 'Compra');
+            }
+
+            if ($this->purchase_order_id) {
+                $purchase = PurchaseOrder::findOrFail($this->purchase_order_id);
+
+                $purchase->update([
+                    'status' => 1,
+                ]);
             }
 
             DB::commit();

@@ -19,6 +19,7 @@ class PurchaseOrder extends Model
         'observation',
         'status'
     ];
+
     protected $casts = ['date' => 'date'];
 
     public function supplier()
