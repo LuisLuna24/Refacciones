@@ -32,6 +32,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'warehouse_id',
         'type_user_id'
     ];
 
@@ -72,6 +73,11 @@ class User extends Authenticatable
     public function TypeUser(): BelongsTo
     {
         return $this->belongsTo(TypeUser::class, 'type_user_id');
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
     }
 
     public function role()

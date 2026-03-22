@@ -40,7 +40,13 @@ class PurchaseOrder extends Model
     public function products()
     {
         return $this->morphToMany(Product::class, 'productable')
-            ->withPivot(['quantity', 'price', 'subtotal'])
+            ->withPivot([
+                'quantity',
+                'price',
+                'subtotal',
+                'ck_pakage',       // Agregado
+                'quantity_pacage'  // Agregado
+            ])
             ->withTimestamps();
     }
 }

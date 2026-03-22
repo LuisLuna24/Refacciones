@@ -12,7 +12,7 @@ class Forms extends Component
 {
     public User $user;
     public $typeForm = 1;
-    public $id, $name, $email, $password, $password_confirmation;
+    public $id, $name, $email, $password, $password_confirmation, $warehouse_id;
 
     // Nueva propiedad para el rol seleccionado
     public $selectedRole;
@@ -23,6 +23,7 @@ class Forms extends Component
             $this->id = $this->user->id;
             $this->name = $this->user->name;
             $this->email = $this->user->email;
+            $this->warehouse_id = $this->user->warehouse_id;
             // Cargamos el rol actual del usuario (asumiendo un rol por usuario)
             $this->selectedRole = $this->user->roles->first()?->name;
             $this->typeForm = 2;
@@ -35,6 +36,7 @@ class Forms extends Component
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $this->id],
             'password' => [$this->id ? 'nullable' : 'required', 'string', 'min:8', 'confirmed'],
+            'warehouse_id' => ['required', 'exists:warehouses,id'],
             'selectedRole' => ['required'], // Validamos que se seleccione un rol
         ]);
 
@@ -43,7 +45,8 @@ class Forms extends Component
             $data = [
                 'name' => $this->name,
                 'email' => $this->email,
-                'type_user_id' => 2
+                'warehouse_id' => $this->warehouse_id,
+                'type_user_id' => $this->selectedRole == 'Admin' ? 1 : 2
             ];
 
             if ($this->password) {

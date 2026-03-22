@@ -39,6 +39,6 @@ class UsersController extends Controller
             'text' => 'El probeedor se ha eliminado con éxito',
         ]);
 
-        return redirect()->route('admin.purchases.suppliers.index');
+        return redirect()->route('admin.users.index');
     }
 }

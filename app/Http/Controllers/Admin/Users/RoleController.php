@@ -32,17 +32,37 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
-        Gate::authorize('delete-roles');
-        if ($role->user()->exists()) {
-            Session::flash('swal', [
-                'icon' => 'error',
-                'title' => 'Error!',
-                'text' => 'No se puede eliminar el role porque tiene usuarios asociados!',
+        try {
+            // 1. Autorización
+            Gate::authorize('delete-roles');
+
+            // 2. Validación de restricción (Nota el plural 'users')
+            // Usamos exists() en lugar de count() > 0 porque es más eficiente en BD
+            if ($role->users()->exists()) {
+                Session::flash('swal', [
+                    'icon'  => 'error',
+                    'title' => '¡No permitido!',
+                    'text'  => 'No se puede eliminar el rol porque tiene usuarios asociados.',
+                ]);
+                return null;
+            }
+
+            // 3. Eliminación
+            $role->delete();
+
+            session()->flash('swal', [
+                'icon'  => 'success',
+                'title' => '¡Eliminado!',
+                'text'  => 'El rol ha sido eliminado correctamente.',
             ]);
-            return;
+        } catch (\Exception $e) {
+            Session::flash('swal', [
+                'icon'  => 'error',
+                'title' => '¡Error!',
+                'text'  => 'Ocurrió un error inesperado: ' . $e->getMessage(),
+            ]);
         }
 
-        $role->delete();
-        return redirect('admin.roles.index');
+        return redirect()->route('admin.roles.index');
     }
 }

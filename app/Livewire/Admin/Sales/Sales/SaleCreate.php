@@ -7,6 +7,7 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Quote;
 use App\Models\Sale;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -24,6 +25,7 @@ class SaleCreate extends Component
     public $date;
     public $total = 0.00;
     public $observation;
+    public $payment_method = 1;
 
     public $category_id;
 
@@ -38,6 +40,7 @@ class SaleCreate extends Component
         $this->serie = 'VEN' . now()->format('Y');
         // Asegúrate de que Sale::max('correlative') maneje el caso de tabla vacía
         $this->correlative = (Sale::max('correlative') ?? 0) + 1;
+        $this->warehouse_id = Auth::user()->warehouse_id;
     }
 
     public function updated($property, $value)
@@ -49,6 +52,7 @@ class SaleCreate extends Component
                 $this->voucher_type = $quote->voucher_type;
                 $this->customer_id = $quote->customer_id;
                 $this->warehouse_id = $quote->warehouse_id;
+                $this->payment_method = $quote->payment_method;
 
                 $this->products = $quote->products->map(function ($product) {
                     return [
@@ -117,6 +121,7 @@ class SaleCreate extends Component
             'quote_id' => ['nullable', 'exists:quotes,id'],
             'total' => ['required', 'numeric', 'min:0.01'],
             'observation' => ['nullable', 'string', 'max:255'],
+            'payment_method' => ['required', 'in:1,2,3,4'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.id' => ['required', 'exists:products,id'],
             'products.*.quantity' => ['required', 'numeric', 'min:0.1'],
@@ -141,6 +146,7 @@ class SaleCreate extends Component
                 'quote_id' => $this->quote_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
+                'payment_method' => $this->payment_method,
             ]);
 
             foreach ($this->products as $product) {

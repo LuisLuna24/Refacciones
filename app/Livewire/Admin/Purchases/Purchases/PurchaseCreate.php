@@ -3,18 +3,19 @@
 namespace App\Livewire\Admin\Purchases\Purchases;
 
 use App\Facades\Kardex;
-use App\Models\Inventory; // Importante para la subconsulta de stock
+use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
 
 class PurchaseCreate extends Component
 {
-
     use WithPagination;
+
     // Búsqueda y Filtros
     public $search = '';
 
@@ -49,24 +50,36 @@ class PurchaseCreate extends Component
             if ($purchaseOrder) {
                 $this->voucher_type = $purchaseOrder->voucher_type;
                 $this->supplier_id = $purchaseOrder->supplier_id;
-                $this->warehouse_id = $purchaseOrder->warehouse_id;
+                $this->warehouse_id = $purchaseOrder->warehouse_id ?? Auth::user()->warehouse_id;;
 
-                // Mapeamos los productos de la orden a la compra
-                $this->products = $purchaseOrder->products->map(function ($produc) {
+                // Mapeamos los productos de la orden adaptándolos a la nueva lógica de Paquetes
+                $this->products = $purchaseOrder->products->map(function ($product) {
+                    $isPackage = (bool) ($product->pivot->ck_pakage ?? false);
+                    $hasPackages = $product->cost_package > 0;
+
+                    // Si se compró por paquete en la OC, mostramos la cantidad de paquetes
+                    $uiQuantity = $isPackage ? $product->pivot->quantity_pacage : $product->pivot->quantity;
+
                     return [
-                        'id' => $produc->id,
-                        'name' => $produc->name,
-                        'quantity' => $produc->pivot->quantity,
-                        'price' => $produc->pivot->price, // Aquí es el COSTO pactado en la orden
-                        'subtotal' => $produc->pivot->subtotal,
-                        'sku' => $produc->sku ?? '',
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'sku' => $product->sku ?? '',
+                        'has_packages' => $hasPackages,
+                        'purchase_type' => $isPackage ? 'package' : 'unit',
+                        'unit_price' => (float) $product->cost,
+                        'package_price' => (float) $product->cost_package,
+                        'units_per_package' => (int) ($product->units_package ?? 1),
+                        'price' => (float) $product->pivot->price, // Costo pactado en la OC
+                        'quantity' => (float) $uiQuantity,
+                        'subtotal' => (float) $product->pivot->subtotal,
                     ];
                 })->toArray();
             }
+        } else {
+            $this->warehouse_id = Auth::user()->warehouse_id;
         }
     }
 
-    // Método para agregar desde el click en la Card
     public function addFromCard($id)
     {
         $this->product_id = $id;
@@ -93,17 +106,32 @@ class PurchaseCreate extends Component
 
         $product = Product::find($this->product_id);
 
+        // Lógica de paquetes al agregar manualmente
+        $hasPackages = $product->cost_package > 0;
+        $defaultType = $hasPackages ? 'package' : 'unit';
+        $defaultPrice = $hasPackages ? $product->cost_package : $product->cost;
+
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $product->cost, // Importante: Sugerimos el costo, no el precio de venta
-            'quantity' => 1,
-            'subtotal' => $product->cost,
             'sku' => $product->sku ?? '',
+            'has_packages' => $hasPackages,
+            'purchase_type' => $defaultType,
+            'unit_price' => (float) $product->cost,
+            'package_price' => (float) $product->cost_package,
+            'units_per_package' => (int) ($product->units_package ?? 1),
+            'price' => (float) $defaultPrice,
+            'quantity' => 1,
+            'subtotal' => (float) $defaultPrice,
         ];
 
-        // Limpiamos búsqueda
         $this->reset(['product_id', 'search']);
+    }
+
+    public function removeProduct($index)
+    {
+        unset($this->products[$index]);
+        $this->products = array_values($this->products);
     }
 
     public function save()
@@ -119,7 +147,7 @@ class PurchaseCreate extends Component
             'products' => ['required', 'array', 'min:1'],
             'products.*.id' => ['required', 'exists:products,id'],
             'products.*.quantity' => ['required', 'numeric', 'min:0.1'],
-            'products.*.price' => ['required', 'numeric', 'min:0'], // Validamos Costo >= 0
+            'products.*.price' => ['required', 'numeric', 'min:0'],
         ], [], ['supplier_id' => 'proveedor', 'products' => 'productos']);
 
         DB::beginTransaction();
@@ -137,26 +165,40 @@ class PurchaseCreate extends Component
                 'observation' => $this->observation,
             ]);
 
-
             foreach ($this->products as $product) {
+                // Evaluamos si es paquete
+                $isPackage = $product['purchase_type'] === 'package';
+
+                // Calculamos LA CANTIDAD FÍSICA REAL que entrará al inventario
+                $totalPhysicalQuantity = $isPackage
+                    ? ($product['quantity'] * $product['units_per_package'])
+                    : $product['quantity'];
+
                 $subtotal = $product['quantity'] * $product['price'];
 
+                // ¡Nota importante! Asegúrate de que la tabla pivote de Purchase
+                // también tenga las columnas ck_pakage y quantity_pacage
                 $purchase->products()->attach($product['id'], [
-                    'quantity' => $product['quantity'],
+                    'quantity' => $totalPhysicalQuantity,
                     'price' => $product['price'],
                     'subtotal' => $subtotal,
+                    'ck_pakage' => $isPackage ? 1 : 0,
+                    'quantity_pacage' => $isPackage ? $product['quantity'] : null,
                 ]);
 
-                // Registro de Entrada en Kardex
-                Kardex::registerEntry($purchase->id, Purchase::class, $product, $this->warehouse_id, 'Compra');
+                // ¡SÚPER CRÍTICO PARA EL KARDEX!
+                // Clonamos el array del producto para inyectarle la cantidad física total
+                // Si no hacemos esto, el Kardex registraría '2' en vez de '24' piezas
+                $productForKardex = $product;
+                $productForKardex['quantity'] = $totalPhysicalQuantity;
+
+                // Registro de Entrada en Kardex con la cantidad física
+                Kardex::registerEntry($purchase->id, Purchase::class, $productForKardex, $this->warehouse_id, 'Compra');
             }
 
             if ($this->purchase_order_id) {
-                $purchase = PurchaseOrder::findOrFail($this->purchase_order_id);
-
-                $purchase->update([
-                    'status' => 1,
-                ]);
+                $purchaseOrder = PurchaseOrder::findOrFail($this->purchase_order_id);
+                $purchaseOrder->update(['status' => 1]); // Status completado
             }
 
             DB::commit();

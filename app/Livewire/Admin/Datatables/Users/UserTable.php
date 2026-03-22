@@ -11,14 +11,14 @@ class UserTable extends DataTableComponent
 {
     public function builder(): Builder
     {
-        return User::query();
-            //->with(['customer', 'warehouse', 'quote']);
+        return User::query()
+            ->with(['warehouse']);
     }
 
     public function configure(): void
     {
         $this->setPrimaryKey('id');
-        $this->setDefaultSort('id','desc');
+        $this->setDefaultSort('id', 'desc');
     }
 
     public function columns(): array
@@ -29,6 +29,8 @@ class UserTable extends DataTableComponent
             Column::make("Name", "name")
                 ->sortable(),
             Column::make("Email", "email")
+                ->sortable(),
+            Column::make("Alamcen", "warehouse.name")
                 ->sortable(),
             Column::make("Acciones")
                 ->label(function ($row) {

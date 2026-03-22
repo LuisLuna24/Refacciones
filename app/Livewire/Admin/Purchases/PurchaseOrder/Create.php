@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Admin\Purchases\PurchaseOrder;
 
-use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -36,6 +36,8 @@ class Create extends Component
         $this->date = now()->format('Y-m-d');
         $this->serie = 'OC' . now()->format('Y');
         $this->correlative = (PurchaseOrder::max('correlative') ?? 0) + 1;
+
+        $this->warehouse_id = Auth::user()->warehouse_id;
     }
 
     // Agregar producto desde la tarjeta
@@ -128,19 +130,25 @@ class Create extends Component
                 'warehouse_id' => $this->warehouse_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
+                'status' => 'pending'
             ]);
 
             foreach ($this->products as $product) {
-                // Cantidad real para el Kardex (si decides integrarlo aquí en el futuro)
-                $realPhysicalQuantity = $product['purchase_type'] === 'package'
-                    ? ($product['quantity'] * $product['units_per_package'])
-                    : $product['quantity'];
+                // Verificamos si el usuario seleccionó el toggle de "paquete"
+                $isPackage = $product['purchase_type'] === 'package';
 
-                // Guardamos en la orden de compra cómo se compró comercialmente
+                // Calculamos la CANTIDAD TOTAL física (Para el Kardex/Stock)
+                $totalPhysicalQuantity = $isPackage
+                    ? ($product['quantity'] * $product['units_per_package']) // Ej: 2 paquetes * 12 uds = 24
+                    : $product['quantity']; // Ej: 5 unidades sueltas = 5
+
+                // Guardamos en la tabla pivote productable respetando tus columnas
                 $purchaseOrder->products()->attach($product['id'], [
-                    'quantity' => $product['quantity'],
+                    'quantity' => $totalPhysicalQuantity, // Total de piezas sueltas (Ej: 24)
                     'price' => $product['price'],
                     'subtotal' => $product['quantity'] * $product['price'],
+                    'ck_pakage' => $isPackage ? 1 : 0,
+                    'quantity_pacage' => $isPackage ? $product['quantity'] : null, // La cantidad de paquetes (Ej: 2)
                 ]);
             }
 

@@ -2,10 +2,10 @@
 
 namespace App\Livewire\Admin\Purchases\PurchaseOrder;
 
-use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -13,6 +13,7 @@ use Livewire\WithPagination;
 class Edit extends Component
 {
     use WithPagination;
+
     public PurchaseOrder $purchaseOrder;
 
     // Filtros
@@ -36,7 +37,7 @@ class Edit extends Component
     {
         $this->purchaseOrder = $purchaseOrder;
         $this->supplier_id = $purchaseOrder->supplier_id;
-        $this->warehouse_id = $purchaseOrder->warehouse_id;
+        $this->warehouse_id = $purchaseOrder->warehouse_id ?? Auth::user()->warehouse_id;;
         $this->voucher_type = $purchaseOrder->voucher_type;
         $this->serie = $purchaseOrder->serie;
         $this->correlative = $purchaseOrder->correlative;
@@ -44,15 +45,32 @@ class Edit extends Component
         $this->observation = $purchaseOrder->observation;
         $this->total = $purchaseOrder->total;
 
-        // Cargar productos existentes
-        $this->products = $purchaseOrder->products->map(function ($produc) {
+        // Cargar productos existentes y prepararlos para la UX visual de AlpineJS
+        $this->products = $purchaseOrder->products->map(function ($product) {
+            // Evaluamos cómo se guardó originalmente (Paquete vs Unidad)
+            $isPackage = (bool) $product->pivot->ck_pakage;
+            $hasPackages = $product->cost_package > 0;
+
+            // La cantidad visual (Lo que el usuario ve en el input)
+            // Si es paquete, mostramos cuántos paquetes compró. Si es unidad, cuántas unidades sueltas.
+            $uiQuantity = $isPackage ? $product->pivot->quantity_pacage : $product->pivot->quantity;
+
             return [
-                'id' => $produc->id,
-                'name' => $produc->name,
-                'quantity' => (float) $produc->pivot->quantity,
-                'price' => (float) $produc->pivot->price,
-                'subtotal' => (float) $produc->pivot->subtotal,
-                'sku' => $produc->sku ?? '', // Agregamos SKU para visualización
+                'id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku ?? '',
+
+                // Datos requeridos por AlpineJS para los Toggles
+                'has_packages' => $hasPackages,
+                'purchase_type' => $isPackage ? 'package' : 'unit',
+                'unit_price' => (float) $product->cost,
+                'package_price' => (float) $product->cost_package,
+                'units_per_package' => (int) ($product->units_package ?? 1),
+
+                // Datos del carrito actual
+                'price' => (float) $product->pivot->price,
+                'quantity' => (float) $uiQuantity,
+                'subtotal' => (float) $product->pivot->subtotal,
             ];
         })->toArray();
     }
@@ -68,7 +86,7 @@ class Edit extends Component
         $this->validate([
             'product_id' => ['required', 'exists:products,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id']
-        ], [], ['product_id' => 'producto', 'warehouse_id' => 'almacen']);
+        ], [], ['product_id' => 'producto', 'warehouse_id' => 'almacén']);
 
         $existing = collect($this->products)->firstWhere('id', $this->product_id);
 
@@ -83,23 +101,33 @@ class Edit extends Component
 
         $product = Product::find($this->product_id);
 
+        // Lógica de UX al agregar nuevo producto en modo edición
+        $hasPackages = $product->cost_package > 0;
+        $defaultType = $hasPackages ? 'package' : 'unit';
+        $defaultPrice = $hasPackages ? $product->cost_package : $product->cost;
+
         $this->products[] = [
             'id' => $product->id,
             'name' => $product->name,
-            'price' => $product->cost,
-            'quantity' => $product->cost_package > 0 ? $product->units_package : 1,
-            'subtotal' => $product->cost,
             'sku' => $product->sku ?? '',
+            'has_packages' => $hasPackages,
+            'purchase_type' => $defaultType,
+            'unit_price' => (float) $product->cost,
+            'package_price' => (float) $product->cost_package,
+            'units_per_package' => (int) ($product->units_package ?? 1),
+            'price' => (float) $defaultPrice,
+            'quantity' => 1,
+            'subtotal' => (float) $defaultPrice,
         ];
 
         $this->reset(['product_id', 'search']);
     }
 
-    // Eliminamos productos del array visualmente
+    // Eliminamos productos del array visualmente (Opcional, Alpine lo hace con splice, pero es buena práctica tenerlo)
     public function removeProduct($index)
     {
         unset($this->products[$index]);
-        $this->products = array_values($this->products); // Reindexar array
+        $this->products = array_values($this->products);
     }
 
     public function save()
@@ -122,13 +150,23 @@ class Edit extends Component
             $syncData = [];
 
             foreach ($this->products as $product) {
+                // Verificamos el estado actual del toggle (Paquete o Unidad)
+                $isPackage = $product['purchase_type'] === 'package';
+
+                // Calculamos la CANTIDAD TOTAL física para el Stock
+                $totalPhysicalQuantity = $isPackage
+                    ? ($product['quantity'] * $product['units_per_package'])
+                    : $product['quantity'];
+
                 $subtotal = $product['quantity'] * $product['price'];
                 $calculatedTotal += $subtotal;
 
                 $syncData[$product['id']] = [
-                    'quantity' => $product['quantity'],
+                    'quantity' => $totalPhysicalQuantity, // Lo que entrará al almacén
                     'price' => $product['price'],
                     'subtotal' => $subtotal,
+                    'ck_pakage' => $isPackage ? 1 : 0,
+                    'quantity_pacage' => $isPackage ? $product['quantity'] : null, // Los paquetes tecleados
                 ];
             }
 
@@ -138,11 +176,12 @@ class Edit extends Component
                 'voucher_type' => $this->voucher_type,
                 'date' => $this->date,
                 'supplier_id' => $this->supplier_id,
-                'warehouse_id' => $this->warehouse_id, // Permitimos actualizar almacén si es necesario
+                'warehouse_id' => $this->warehouse_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
             ]);
 
+            // Sync se encarga de insertar los nuevos, actualizar los existentes y borrar los que se quitaron
             $this->purchaseOrder->products()->sync($syncData);
 
             DB::commit();
@@ -150,7 +189,7 @@ class Edit extends Component
             session()->flash('swal', [
                 'icon' => 'success',
                 'title' => '¡Actualizado!',
-                'text' => 'La orden de compra ha sido modificada.',
+                'text' => 'La orden de compra ha sido modificada correctamente.',
             ]);
 
             return redirect()->route('admin.purchase_orders.index');
@@ -169,7 +208,6 @@ class Edit extends Component
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('sku', 'like', '%' . $this->search . '%');
             })
-            // Opcional: Filtrar catálogo por el proveedor seleccionado
             ->where('supplier_id', $this->supplier_id)
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->addSelect([

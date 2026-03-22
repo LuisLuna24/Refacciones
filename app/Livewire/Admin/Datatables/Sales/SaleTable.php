@@ -76,6 +76,24 @@ class SaleTable extends DataTableComponent
             Column::make("Almacen", "warehouse.name")
                 ->sortable(),
 
+            // --- NUEVA COLUMNA DE MÉTODO DE PAGO ---
+            Column::make("Método de Pago", "payment_method")
+                ->sortable()
+                ->format(function ($value) {
+                    // Si implementaste el Enum (Opción A), puedes descomentar la siguiente línea:
+                    // return $value->name;
+
+                    // Si dejaste el tinyInteger normal, mapeamos el número a texto aquí:
+                    $metodos = [
+                        1 => 'Efectivo',
+                        2 => 'Tarjeta',
+                        3 => 'Transferencia',
+                        4 => 'Paypal'
+                    ];
+
+                    return $value ? $value->name : 'N/A';
+                }),
+
             Column::make("Total", "total")
                 ->sortable()
                 ->format(fn($value) => '$ ' . number_format($value, 2, '.', ',')),

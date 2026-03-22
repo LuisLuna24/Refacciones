@@ -17,7 +17,7 @@ class QuoteTable extends DataTableComponent
     public function configure(): void
     {
         $this->setPrimaryKey('id');
-        $this->setDefaultSort('id','desc');
+        $this->setDefaultSort('id', 'desc');
 
         $this->setConfigurableAreas([
             'after-wrapper' => [
@@ -26,7 +26,7 @@ class QuoteTable extends DataTableComponent
         ]);
     }
 
-     //=====================Filtors
+    //=====================Filtors
 
     public function filters(): array
     {
@@ -66,6 +66,18 @@ class QuoteTable extends DataTableComponent
                 ->format(fn($value) => $value->format('Y-m-d')),
             Column::make("Cliente", "customer.name")
                 ->sortable(),
+            Column::make("Método de Pago", "payment_method")
+                ->sortable()
+                ->format(function ($value) {
+                    $metodos = [
+                        1 => 'Efectivo',
+                        2 => 'Tarjeta',
+                        3 => 'Transferencia',
+                        4 => 'Paypal'
+                    ];
+
+                    return $value ? $value->name : 'N/A';
+                }),
             Column::make("Total", "total")
                 ->sortable()
                 ->format(fn($value) => '$ ' . number_format($value, 2, '.', ',')),
@@ -103,8 +115,6 @@ class QuoteTable extends DataTableComponent
         $this->form['addressee'] = $model->customer?->name ?? 'Cliente sin registrar';
         $this->form['email'] = $model->customer->email ?? '';
         $this->form['model'] = $model;
-
-
     }
 
     public function sendEmail()

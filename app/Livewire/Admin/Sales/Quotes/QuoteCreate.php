@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Sales\Quotes;
 use App\Models\Inventory; // Asegúrate de importar esto
 use App\Models\Product;
 use App\Models\Quote;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,6 +26,7 @@ class QuoteCreate extends Component
     public $date;
     public $total = 0.00;
     public $observation;
+    public $payment_method = 1;
 
     // Productos
     public $product_id;
@@ -35,6 +37,8 @@ class QuoteCreate extends Component
         $this->date = now()->format('Y-m-d');
         $this->serie = 'COT' . now()->format('Y');
         $this->correlative = (Quote::max('correlative') ?? 0) + 1;
+
+        $this->warehouse_id = Auth::user()->warehouse_id;
     }
 
     /**
@@ -91,7 +95,11 @@ class QuoteCreate extends Component
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'total' => ['required', 'numeric', 'min:0'],
             'observation' => ['nullable', 'string', 'max:255'],
+            'payment_method' => ['required', 'in:1,2,3,4'],
             'products' => ['required', 'array', 'min:1'],
+            'products.*.id' => ['required', 'exists:products,id'],
+            'products.*.quantity' => ['required', 'numeric', 'min:0.1'],
+            'products.*.price' => ['required', 'numeric', 'min:0'],
         ], [], ['customer_id' => 'cliente', 'products' => 'productos']);
 
         DB::beginTransaction();
@@ -106,6 +114,7 @@ class QuoteCreate extends Component
                 'warehouse_id' => $this->warehouse_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
+                'payment_method' => $this->payment_method,
             ]);
 
             foreach ($this->products as $product) {
@@ -125,7 +134,6 @@ class QuoteCreate extends Component
             ]);
 
             return redirect()->route('admin.quotes.index');
-
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('swal', [
@@ -142,19 +150,20 @@ class QuoteCreate extends Component
 
         // Consulta del catálogo con Stock informativo
         $catalog = Product::query()
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->orWhere('sku', 'like', '%' . $this->search . '%');
             })
             ->when($warehouseId, function ($query) use ($warehouseId) {
-                $query->addSelect(['stock' => Inventory::select('quantity_balance')
-                    ->whereColumn('product_id', 'products.id')
-                    ->where('warehouse_id', $warehouseId)
-                    ->orderBy('id', 'desc')
-                    ->limit(1)
+                $query->addSelect([
+                    'stock' => Inventory::select('quantity_balance')
+                        ->whereColumn('product_id', 'products.id')
+                        ->where('warehouse_id', $warehouseId)
+                        ->orderBy('id', 'desc')
+                        ->limit(1)
                 ]);
             })
-            ->paginate('16',pageName:'products-page');
+            ->paginate('16', pageName: 'products-page');
 
         return view('livewire.admin.sales.quotes.quote-create', compact('catalog'));
     }

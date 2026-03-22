@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\DeliveryNote;
 use App\Models\Product;
 use App\Models\Warehouse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
@@ -46,7 +47,7 @@ class Forms extends Component
             $this->guest_name = $this->deliveryNote->guest_name;
             $this->guest_phone = $this->deliveryNote->guest_phone;
             $this->guest_email = $this->deliveryNote->guest_email;
-            $this->warehouse_id = $this->deliveryNote->warehouse_id;
+            $this->warehouse_id = $this->deliveryNote->warehouse_id ?? Auth::user()->warehouse_id;;
             $this->voucher_type = $this->deliveryNote->voucher_type;
             $this->serie = $this->deliveryNote->serie;
             $this->correlative = $this->deliveryNote->correlative;
@@ -69,6 +70,8 @@ class Forms extends Component
                     'price' => $item->price,
                 ];
             }
+        } else {
+            $this->warehouse_id = Auth::user()->warehouse_id;
         }
     }
 
@@ -103,10 +106,11 @@ class Forms extends Component
         return $this->getTotal() - (float)$this->installment;
     }
 
-    public function statusDelivery(){
-        if($this->installment < $this->getTotal()){
+    public function statusDelivery()
+    {
+        if ($this->installment < $this->getTotal()) {
             $this->status = 1; // Pendiente de pago
-        }else{
+        } else {
             $this->status = 2; // Total pagoado
         }
     }
@@ -115,9 +119,9 @@ class Forms extends Component
     {
         $this->validate([
             'customer_id' => ['nullable', 'exists:customers,id'],
-            'guest_name' => ['nullable', 'string','max:100'],
-            'guest_phone' => ['nullable', 'string','max:20'],
-            'guest_email' => ['nullable', 'string','max:100'],
+            'guest_name' => ['nullable', 'string', 'max:100'],
+            'guest_phone' => ['nullable', 'string', 'max:20'],
+            'guest_email' => ['nullable', 'string', 'max:100'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'voucher_type' => ['required', 'in:1,2'],
             'items' => ['required', 'array', 'min:1'],

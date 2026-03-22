@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 
 class Quote extends Model
@@ -17,10 +18,14 @@ class Quote extends Model
         'warehouse_id',
         'total',
         'observation',
-        'status'
+        'status',
+        'payment_method'
     ];
 
-    protected $casts = ['date' => 'date'];
+    protected $casts = [
+        'date' => 'date',
+        'payment_method' => PaymentMethod::class,
+    ];
 
     public function customer()
     {
@@ -40,7 +45,13 @@ class Quote extends Model
     public function products()
     {
         return $this->morphToMany(Product::class, 'productable')
-            ->withPivot(['quantity', 'price', 'subtotal'])
+            ->withPivot([
+                'quantity',
+                'price',
+                'subtotal',
+                'ck_pakage',       // Agregado
+                'quantity_pacage'  // Agregado
+            ])
             ->withTimestamps();
     }
 }
