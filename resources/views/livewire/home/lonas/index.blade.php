@@ -7,7 +7,7 @@
         }
     </style>
 
-    <section class=" bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center">
+    <section class=" bg-gray-50 dark:bg-gray-900 min-h-screen flex items-center justify-center py-10">
 
         <div class="max-w-5xl mx-auto px-4 w-full">
             <div class="text-center mb-12">
@@ -66,6 +66,30 @@
                     </h3>
 
                     <div class="space-y-4">
+
+                        {{-- NUEVO: Opción de Diseño --}}
+                        <label
+                            class="flex items-start p-4 border border-blue-200 dark:border-blue-900/50 bg-blue-50/30 dark:bg-blue-900/10 rounded-lg cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                            <div class="flex items-center h-5">
+                                <input wire:model.live="needsDesign" type="checkbox"
+                                    class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <span
+                                    class="font-bold text-blue-700 dark:text-blue-400 block text-base flex items-center">
+                                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
+                                        </path>
+                                    </svg>
+                                    Diseño Gráfico
+                                </span>
+                                <span class="text-blue-600/80 dark:text-blue-400/80 block mt-1">Armado de propuesta o
+                                    vectorizado (+${{ number_format($this->designPrice, 2) }}).</span>
+                            </div>
+                        </label>
+
+                        {{-- Opción de Urgencia Original --}}
                         <label
                             class="flex items-start p-4 border border-red-200 dark:border-red-900/50 bg-red-50/30 dark:bg-red-900/10 rounded-lg cursor-pointer hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
                             <div class="flex items-center h-5">
@@ -82,7 +106,7 @@
                                     Servicio Urgente (Prioridad)
                                 </span>
                                 <span class="text-red-600/80 dark:text-red-400/80 block mt-1">Se agrega un 20% al total
-                                    para adelantar tu pedido en la fila de producción.</span>
+                                    para adelantar tu pedido.</span>
                             </div>
                         </label>
                     </div>
@@ -107,16 +131,25 @@
                                 <span class="font-medium">{{ $quantity }} pieza(s)</span>
                             </div>
 
+                            {{-- NUEVO: Muestra si se aplicó precio normal o mayoreo --}}
                             <div
                                 class="flex justify-between {{ $this->isMinimumCharge ? 'text-amber-400' : 'text-gray-300' }}">
-                                <span>Precio impresión (c/u):</span>
+                                <div class="flex flex-col">
+                                    <span>Costo de Impresión:</span>
+                                    @if ($this->totalArea >= 4)
+                                        <span class="text-xs text-green-400 font-bold tracking-wide mt-1">✓ PRECIO
+                                            MAYOREO APLICADO ($95/m²)</span>
+                                    @else
+                                        <span class="text-xs text-gray-500 mt-1">Precio normal (${{ number_format($this->meterPrice, 2) }}/m²)</span>
+                                    @endif
+                                </div>
                                 <div class="text-right">
                                     @if ($this->isMinimumCharge)
                                         <span class="font-medium">${{ number_format($minPrice, 2) }}</span>
-                                        <span class="block text-xs opacity-80">(Cobro mínimo aplicado)</span>
+                                        <span class="block text-xs opacity-80">(Cobro mínimo)</span>
                                     @else
                                         <span
-                                            class="font-medium">${{ number_format($this->area * $pricePerSqm, 2) }}</span>
+                                            class="font-medium">${{ number_format($this->totalArea * $this->currentPricePerSqm, 2) }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -128,13 +161,14 @@
                                     @if ($needsDesign)
                                         <div class="flex justify-between text-gray-300 text-sm">
                                             <span>Diseño</span>
-                                            <span>+$150.00</span>
+                                            <span>+${{ number_format($this->designPrice, 2) }}</span>
                                         </div>
                                     @endif
                                     @if ($needsTubes)
                                         <div class="flex justify-between text-gray-300 text-sm">
                                             <span>Tubos/Maderas</span>
-                                            <span>Incluido en suma</span>
+                                            {{-- CORRECCIÓN: Muestra el precio real de los tubos según el ancho y cantidad --}}
+                                            <span>+${{ number_format($width * 30 * $quantity, 2) }}</span>
                                         </div>
                                     @endif
                                     @if ($isUrgent)
