@@ -155,7 +155,7 @@
                             class="bg-emerald-50/30 dark:bg-gray-900/50 p-3 rounded-lg border border-emerald-100 dark:border-gray-700 space-y-3">
                             <div class="grid grid-cols-2 gap-3">
                                 <x-w-select label="Almacén (Ref. Stock)" placeholder="Seleccionar..."
-                                    wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']" option-label="name"
+                                    wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]" option-label="name"
                                     option-value="id" :clearable="false" />
                                 <x-w-input type="date" wire:model="date" label="Fecha Validez" />
                             </div>
@@ -244,7 +244,7 @@
                         <div
                             class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 space-y-3">
                             <x-w-select label="Cliente Potencial" placeholder="Buscar cliente..."
-                                wire:model="customer_id" :async-data="['api' => route('api.customers.index'), 'method' => 'POST']" option-label="name" option-value="id" />
+                                wire:model="customer_id" :async-data="['api' => route('api.customers.index'), 'method' => 'GET',]" option-label="name" option-value="id" />
 
                             <x-w-textarea label="Condiciones Especiales" wire:model="observation"
                                 placeholder="Validez de oferta, tiempo de entrega, formas de pago..."

@@ -212,12 +212,12 @@
                                 </div>
                             </div>
 
-                            <x-w-select label="Almacén *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']"
+                            <x-w-select label="Almacén *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET']"
                                 option-label="name" option-value="id" :disabled="count($products) > 0" />
 
                             <x-w-select label="Razón" placeholder="..." wire:model="reason_id" :async-data="[
                                 'api' => route('api.reasons.index'),
-                                'method' => 'POST',
+                                'method' => 'GET',
                                 'params' => ['type' => $type],
                             ]"
                                 option-label="name" option-value="id" />

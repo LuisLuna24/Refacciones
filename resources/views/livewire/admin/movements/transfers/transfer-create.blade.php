@@ -146,7 +146,7 @@
                     <form wire:submit.prevent="save" class="space-y-4">
 
                         <div class="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg space-y-3 border dark:border-gray-700">
-                            <x-w-select label="Origen (Desde) *" wire:model.live="origin_warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']"
+                            <x-w-select label="Origen (Desde) *" wire:model.live="origin_warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]"
                                 option-label="name" option-value="id" :disabled="count($products) > 0" />
 
                             <div class="flex justify-center -my-2 relative z-10">
@@ -161,7 +161,7 @@
                             <x-w-select label="Destino (Hacia) *" wire:model.live="destination_warehouse_id"
                                 :async-data="[
                                     'api' => route('api.warehouses.index'),
-                                    'method' => 'POST',
+                                    ''method' => 'GET',
                                     'params' => ['exclude' => $origin_warehouse_id], // Excluimos el origen
                                 ]" option-label="name" option-value="id" />
                         </div>

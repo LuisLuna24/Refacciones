@@ -33,6 +33,8 @@ class MovementCreate extends Component
 
     public function mount()
     {
+
+        $this->warehouse_id = auth()->user()->warehouse_id; // Asignar el almacén de la sesión
         $this->date = now()->format('Y-m-d');
         $this->serie = 'MOV' . now()->format('Y');
         $this->correlative = (Movement::max('correlative') ?? 0) + 1;

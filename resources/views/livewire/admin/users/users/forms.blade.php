@@ -23,7 +23,7 @@
 
             <x-w-select label="Almacen que asignado"
                 placeholder="Seleccione un almacen al que sera asignado este usuario" wire:model.live="warehouse_id"
-                :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']" option-label="name" option-value="id" />
+                :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]" option-label="name" option-value="id" />
 
             <div class="flex justify-end gap-2">
                 <x-w-button type="submit" blue spinner="save">Guardar Usuario</x-w-button>

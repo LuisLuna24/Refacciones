@@ -75,6 +75,65 @@ class Forms extends Component
         }
     }
 
+    public function updated($property, $value)
+    {
+        // Verificamos si la propiedad que cambió es un product_id
+        if (str_starts_with($property, 'items.') && str_ends_with($property, '.product_id')) {
+
+            $parts = explode('.', $property);
+            $index = (int) $parts[1]; // El índice de la fila actual
+
+            if ($value) {
+                // 1. Verificar si el producto ya está en OTRA fila
+                $existingIndex = null;
+
+                foreach ($this->items as $i => $item) {
+                    // Si encontramos el mismo product_id y NO es la fila en la que estamos editando
+                    if ($i !== $index && isset($item['product_id']) && $item['product_id'] == $value) {
+                        $existingIndex = $i;
+                        break;
+                    }
+                }
+
+                // 2. Si ya existe, sumamos la cantidad y reseteamos la fila actual
+                if ($existingIndex !== null) {
+                    // Tomamos la cantidad que ya tenía la fila existente (por defecto 0 si estaba vacía)
+                    $currentQty = (float) ($this->items[$existingIndex]['quantity'] ?? 0);
+
+                    // Tomamos la cantidad de la fila actual (usualmente 1 si se acaba de agregar)
+                    $addedQty = (float) ($this->items[$index]['quantity'] ?? 1);
+
+                    // Sumamos
+                    $this->items[$existingIndex]['quantity'] = $currentQty + $addedQty;
+
+                    // Limpiamos la fila actual para que el usuario pueda buscar otro producto en ella
+                    $this->items[$index]['product_id'] = null;
+                    $this->items[$index]['description'] = '';
+                    $this->items[$index]['price'] = 0;
+                    $this->items[$index]['quantity'] = 1; // Devolvemos la cantidad a 1 por defecto
+
+                    return; // Salimos de la función para no consultar la BD
+                }
+
+                // 3. Si NO existe, consultamos la BD como lo hacíamos antes
+                $product = Product::find($value);
+
+                if ($product) {
+                    $this->items[$index]['price'] = $product->price;
+
+                    if (empty($this->items[$index]['description'])) {
+                        $this->items[$index]['description'] = $product->name;
+                    }
+                }
+            } else {
+                // Si el usuario vacía el select, limpiamos los datos de esa fila
+                $this->items[$index]['price'] = 0;
+                $this->items[$index]['description'] = '';
+            }
+        }
+    }
+
+
     // Método para agregar una nueva fila vacía
     public function addItem()
     {
@@ -125,7 +184,11 @@ class Forms extends Component
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'voucher_type' => ['required', 'in:1,2'],
             'items' => ['required', 'array', 'min:1'],
-            'items.*.description' => ['required', 'string'],
+            'items.*.description' => [
+                'required_without:items.*.product_id',
+                'nullable',
+                'string'
+            ],
             'items.*.quantity' => ['required', 'numeric', 'min:0.1'],
             'items.*.price' => ['required', 'numeric', 'min:0'],
             'observation' => ['nullable', 'string', 'max:255'],

@@ -93,6 +93,8 @@ Route::get('reports/top-costumers', [ReportController::class, 'topCustomers'])->
 
 Route::get('reports/low-stock', [ReportController::class, 'lowStock'])->name('reports.low-stock');
 
+Route::get('reports/box-buts', [ReportController::class, 'lowStock'])->name('box-buts.index');
+
 //========== Users
 
 Route::resource('users', UsersController::class)->only('index', 'create', 'edit','destroy');

@@ -133,15 +133,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="col-span-1 md:col-span-2">
                                     <x-w-select label="Proveedor" placeholder="Seleccione un proveedor"
-                                        wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name"
+                                        wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'GET',]" option-label="name"
                                         option-value="id" :clearable="false" :disabled="count($products) > 0" />
                                 </div>
 
-                                <x-w-select label="Almacén Destino *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']"
+                                <x-w-select label="Almacén Destino *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]"
                                     option-label="name" option-value="id" :disabled="count($products) > 0" />
 
                                 <x-w-select label="Importar Orden" placeholder="Opcional..."
-                                    wire:model.live="purchase_order_id" :async-data="['api' => route('api.purchase-orders.index'), 'method' => 'POST']" option-label="name"
+                                    wire:model.live="purchase_order_id" :async-data="['api' => route('api.purchase-orders.index'), 'method' => 'GET',]" option-label="name"
                                     option-value="id" option-description="description" />
                             </div>
 

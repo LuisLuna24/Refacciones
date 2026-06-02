@@ -47,7 +47,7 @@
                     <x-w-select label="Categoría" placeholder="Seleccione" wire:model.live="category_id"
                         :options="$categories" option-label="name" option-value="id" />
 
-                    <x-w-select label="Proveedor" placeholder="Seleccione" wire:model="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']"
+                    <x-w-select label="Proveedor" placeholder="Seleccione" wire:model="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'GET',]"
                         option-label="name" option-value="id" />
                 </div>
             </section>

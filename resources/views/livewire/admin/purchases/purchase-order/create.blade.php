@@ -139,12 +139,12 @@
                         <div
                             class="bg-emerald-50/50 dark:bg-gray-900 p-3 rounded-lg space-y-3 border border-emerald-100 dark:border-gray-700">
                             <x-w-select label="Proveedor" placeholder="Seleccione un proveedor"
-                                wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'POST']" option-label="name" option-value="id"
+                                wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'GET',]" option-label="name" option-value="id"
                                 :clearable="false" :disabled="count($products) > 0" />
 
                             <div class="grid grid-cols-2 gap-3">
                                 <x-w-select label="Almacén Destino" placeholder="Seleccione un almacen"
-                                    wire:model="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'POST']" option-label="name" option-value="id"
+                                    wire:model="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]" option-label="name" option-value="id"
                                     :clearable="false" />
                                 <x-w-input type="date" wire:model="date" label="Fecha" />
                             </div>

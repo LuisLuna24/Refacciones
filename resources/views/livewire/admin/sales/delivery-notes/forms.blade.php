@@ -132,19 +132,18 @@
                     </div>
 
                     <div
-                        class="overflow-hidden border border-gray-200 dark:border-gray-700 rounded-xl shadow-inner bg-white dark:bg-gray-800">
+                        class="border border-gray-200 dark:border-gray-700 rounded-xl shadow-inner bg-white dark:bg-gray-800">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead class="bg-gray-50 dark:bg-gray-900/50">
                                 <tr class="text-[10px] font-bold text-gray-500 uppercase">
-                                    <!-- Limitamos el producto para dar espacio a la descripción -->
                                     <th class="px-4 py-3 text-left w-1/5">Producto / Servicio</th>
 
-                                    <!-- Esta columna no tiene "w-" para que se expanda al máximo -->
                                     <th class="px-4 py-3 text-left">Descripción Personalizada</th>
 
                                     <th class="px-4 py-3 text-center w-24">Cant.</th>
                                     <th class="px-4 py-3 text-right w-32">P. Unit.</th>
                                     <th class="px-4 py-3 text-right w-32">Subtotal</th>
+
                                     @if ($status != 3)
                                         <th class="px-4 py-3 text-center w-10"></th>
                                     @endif
@@ -153,41 +152,42 @@
                             <tbody class="divide-y divide-gray-100 dark:divide-gray-700">
                                 @foreach ($items as $index => $item)
                                     <tr class="hover:bg-emerald-50/30 dark:hover:bg-emerald-900/5 transition-colors">
-                                        <td class="px-4 py-3">
-                                            <select wire:model="items.{{ $index }}.product_id"
-                                                {{ $status == 3 ? 'disabled' : '' }}
-                                                class="w-full text-xs rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500 transition-all">
-                                                <option value="">-- Trabajo Especial --</option>
-                                                @foreach ($catalogProducts as $product)
-                                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                                @endforeach
-                                            </select>
+
+                                        <td class="px-4 py-3 max-w-xs">
+                                            <x-w-select wire:model.live="items.{{ $index }}.product_id"
+                                                placeholder="-- Pedido personalizado --" :async-data="route('api.productsnotes.index')"
+                                                option-label="name" option-value="id" :disabled="$status == 3" />
                                         </td>
+
                                         <td class="px-4 py-3">
                                             <input type="text" wire:model="items.{{ $index }}.description"
-                                                required {{ $status == 3 ? 'disabled' : '' }}
+                                                @disabled($status == 3)
                                                 placeholder="Ej: Instalación de vinil a medida sobre superficie de aluminio..."
-                                                class="w-full text-xs rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500 transition-all">
+                                                class="w-full text-xs rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500 transition-all disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed">
                                         </td>
+
                                         <td class="px-4 py-3 text-center">
                                             <input type="number" step="0.01"
                                                 wire:model.live="items.{{ $index }}.quantity" required
-                                                {{ $status == 3 ? 'disabled' : '' }}
-                                                class="w-full text-center text-xs font-bold rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500">
+                                                @disabled($status == 3)
+                                                class="w-full text-center text-xs font-bold rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500 disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed">
                                         </td>
+
                                         <td class="px-4 py-3">
                                             <div class="relative">
                                                 <span class="absolute left-2 top-2 text-gray-400 text-xs">$</span>
-                                                <input type="number" step="0.01"
+                                                <input type="number" step="0.01" min="0"
                                                     wire:model.live="items.{{ $index }}.price" required
-                                                    {{ $status == 3 ? 'disabled' : '' }}
-                                                    class="w-full text-right text-xs font-bold pl-5 rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500">
+                                                    @disabled($status == 3)
+                                                    class="w-full text-right text-xs font-bold pl-5 rounded-lg border-gray-200 dark:bg-gray-800 dark:border-gray-600 focus:ring-emerald-500 disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed">
                                             </div>
                                         </td>
+
                                         <td
                                             class="px-4 py-3 text-right font-black text-gray-700 dark:text-gray-200 text-sm whitespace-nowrap">
                                             ${{ number_format(($item['quantity'] ?? 0) * ($item['price'] ?? 0), 2) }}
                                         </td>
+
                                         @if ($status != 3)
                                             <td class="px-4 py-3 text-center">
                                                 <button type="button" wire:click="removeItem({{ $index }})"
