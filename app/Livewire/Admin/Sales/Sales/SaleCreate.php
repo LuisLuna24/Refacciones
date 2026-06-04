@@ -198,7 +198,11 @@ class SaleCreate extends Component
 
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->orWhere('barcode', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('tags', function ($tagQuery) {
+                        $tagQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             })
 
             ->when($this->category_id, function ($query) {
@@ -210,15 +214,14 @@ class SaleCreate extends Component
                     'stock' => Inventory::select('quantity_balance')
                         ->whereColumn('product_id', 'products.id')
                         ->where('warehouse_id', $warehouseId)
-                        ->orderBy('id', 'desc') // Trae el último movimiento de inventario
+                        ->orderBy('id', 'desc')
                         ->limit(1)
                 ]);
                 $query->orderBy('stock', 'desc');
             })
 
-            ->with('category')
+            ->with(['category', 'tags'])
             ->paginate(16, pageName: 'products-page');
-
         return view('livewire.admin.sales.sales.sale-create', compact('catalog'));
     }
 }

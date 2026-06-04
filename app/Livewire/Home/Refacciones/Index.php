@@ -10,7 +10,6 @@ use Livewire\Attributes\Url;
 
 class Index extends Component
 {
-
     use WithPagination;
 
     #[Url(except: '')]
@@ -23,7 +22,9 @@ class Index extends Component
 
     public function mount()
     {
-        $this->categories = Category::all();
+        // Optimización extra: Si tu tabla de categorías es grande, es mejor
+        // traer solo las columnas que vas a usar en tu <select> (ej. id y name).
+        $this->categories = Category::select('id', 'name')->get();
     }
 
     // Resetear paginación si se busca o filtra
@@ -39,15 +40,20 @@ class Index extends Component
 
     public function render()
     {
-        // Consulta base con Eager Loading para optimizar (evitar N+1)
+        // 1. Evitar N+1: Agregamos 'tags' al Eager Loading.
         $query = Product::query()
-            ->with(['category', 'images']);
+            ->with(['category', 'images', 'tags']);
 
-        // Filtro por Buscador (Nombre o Descripción)
+        // 2. Filtro por Buscador (Nombre, Descripción o Tags)
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('description', 'like', '%' . $this->search . '%');
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    // Agregamos la búsqueda por el nombre del tag relacionado
+                    ->orWhereHas('tags', function ($tagQuery) {
+                        // Asumo que la columna en tu tabla de tags se llama 'name'
+                        $tagQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             });
         }
 

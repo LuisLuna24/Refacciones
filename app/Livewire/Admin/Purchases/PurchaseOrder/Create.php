@@ -26,6 +26,8 @@ class Create extends Component
     public $date;
     public $total = 0.00;
     public $observation;
+    public $category_id;
+
 
     // Productos
     public $product_id;
@@ -177,11 +179,21 @@ class Create extends Component
         $supplierId = $this->supplier_id;
 
         $catalog = Product::query()
-            ->where('supplier_id', $supplierId)
+            ->select('products.*')
+
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->orWhere('barcode', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('tags', function ($tagQuery) {
+                        $tagQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             })
+
+            ->when($this->category_id, function ($query) {
+                $query->where('category_id', $this->category_id);
+            })
+
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->addSelect([
                     'stock' => Inventory::select('quantity_balance')
@@ -190,7 +202,10 @@ class Create extends Component
                         ->orderBy('id', 'desc')
                         ->limit(1)
                 ]);
+                $query->orderBy('stock', 'desc');
             })
+
+            ->with(['category', 'tags'])
             ->paginate(16, pageName: 'products-page');
 
         return view('livewire.admin.purchases.purchase-order.create', compact('catalog'));

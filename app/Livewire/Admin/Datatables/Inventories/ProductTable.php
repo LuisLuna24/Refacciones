@@ -6,6 +6,7 @@ use App\Models\Inventory;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Rappasoft\LaravelLivewireTables\Views\Columns\ImageColumn;
@@ -51,6 +52,10 @@ class ProductTable extends DataTableComponent
                 ->sortable(),
             Column::make("Costo", "cost")
                 ->sortable(),
+            Column::make("Tags", "tags")
+                ->label(function ($row) {
+                    return view('Admin.Inventories.products.tags', ['product' => $row]);
+                }),
             Column::make("Stock", 'stock')
                 ->sortable()
                 ->format(function ($value, $row) {
@@ -67,7 +72,7 @@ class ProductTable extends DataTableComponent
     {
 
         return Product::query()
-            ->with(['category', 'images']);
+            ->with(['category', 'images', 'tags']);
     }
 
     //================Propiedades
@@ -90,5 +95,45 @@ class ProductTable extends DataTableComponent
         $this->inventories = Inventory::whereIn('id', $latestInventories)
             ->with(['warehouse'])
             ->get();
+    }
+
+    //================Tags
+
+    public $tagsModal = false;
+
+    public ?Product $tagsProduct = null;
+    public $selectedTags = [];
+    public $newTags = [];
+
+    public function showTags($productId)
+    {
+        $this->reset('selectedTags', 'newTags', 'tagsProduct');
+        $this->tagsProduct = Product::find($productId);
+        $this->selectedTags = $this->tagsProduct->tags->pluck('id')->map(fn($id) => (string) $id)->toArray();
+        $this->newTags = [];
+        $this->tagsModal = true;
+    }
+
+    public function saveTags()
+    {
+        if ($this->tagsProduct) {
+            $createdIds = [];
+
+            // Crear los nuevos tags que vienen de Alpine
+            foreach ($this->newTags as $tagName) {
+                if (trim($tagName) !== '') {
+                    $tag = Tag::firstOrCreate(['name' => trim($tagName)]);
+                    $createdIds[] = (string) $tag->id;
+                }
+            }
+
+            // Unir tags existentes seleccionados con los recién creados
+            $finalTagIds = array_unique(array_merge($this->selectedTags, $createdIds));
+
+            $this->tagsProduct->tags()->sync($finalTagIds);
+            $this->tagsProduct->load('tags');
+
+            $this->tagsModal = false;
+        }
     }
 }

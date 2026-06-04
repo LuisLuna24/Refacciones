@@ -28,6 +28,7 @@ class Edit extends Component
     public $date;
     public $total = 0.00;
     public $observation;
+    public $category_id;
 
     // Productos
     public $product_id;
@@ -204,11 +205,21 @@ class Edit extends Component
         $warehouseId = $this->warehouse_id;
 
         $catalog = Product::query()
+            ->select('products.*')
+
             ->where(function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('sku', 'like', '%' . $this->search . '%');
+                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->orWhere('barcode', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('tags', function ($tagQuery) {
+                        $tagQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             })
-            ->where('supplier_id', $this->supplier_id)
+
+            ->when($this->category_id, function ($query) {
+                $query->where('category_id', $this->category_id);
+            })
+
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->addSelect([
                     'stock' => Inventory::select('quantity_balance')
@@ -217,8 +228,11 @@ class Edit extends Component
                         ->orderBy('id', 'desc')
                         ->limit(1)
                 ]);
+                $query->orderBy('stock', 'desc');
             })
-            ->paginate('16', pageName: 'products-page');
+
+            ->with(['category', 'tags'])
+            ->paginate(16, pageName: 'products-page');
 
         return view('livewire.admin.purchases.purchase-order.edit', compact('catalog'));
     }

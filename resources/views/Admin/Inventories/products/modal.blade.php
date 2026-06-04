@@ -56,4 +56,102 @@
     </ul>
 </x-w-modal-card>
 
+<x-w-modal-card title="Tags" wire:model="tagsModal">
+    <div x-data="{
+        search: '',
+        selectedTags: @entangle('selectedTags'),
+        newTags: @entangle('newTags'),
+        allTags: {{ \App\Models\Tag::orderBy('name')->get()->map(fn($t) => ['id' => (string)$t->id, 'name' => $t->name])->toJson() }},
+        
+        get filteredTags() {
+            if (this.search.trim() === '') {
+                return this.allTags;
+            }
+            return this.allTags.filter(tag => tag.name.toLowerCase().includes(this.search.toLowerCase()));
+        },
+        
+        addTag() {
+            const val = this.search.trim();
+            if (val === '') return;
+            
+            const existing = this.allTags.find(tag => tag.name.toLowerCase() === val.toLowerCase());
+            
+            if (existing) {
+                if (!this.selectedTags.includes(existing.id)) {
+                    this.selectedTags.push(existing.id);
+                }
+            } else {
+                if (!this.newTags.includes(val)) {
+                    this.newTags.push(val);
+                }
+            }
+            this.search = '';
+        },
+        
+        removeNewTag(tagToRemove) {
+            this.newTags = this.newTags.filter(t => t !== tagToRemove);
+        }
+    }">
+    
+        <div class="flex items-center gap-2">
+            <div class="flex-1">
+                <x-w-input 
+                    label="Buscar o crear tag" 
+                    placeholder="Escribe y presiona Enter..."
+                    x-model="search" 
+                    @keydown.enter.prevent="addTag"
+                />
+            </div>
+            <div class="mt-6">
+                <x-w-button @click="addTag" primary>Agregar</x-w-button>
+            </div>
+        </div>
 
+        <div x-show="newTags.length > 0" class="mt-4" style="display: none;">
+            <h5 class="text-xs font-semibold text-gray-500 uppercase">Nuevos por crear:</h5>
+            <div class="flex flex-wrap gap-2 mt-2">
+                <template x-for="nTag in newTags" :key="nTag">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900/30 dark:text-primary-400 border border-primary-200 dark:border-primary-800">
+                        <span x-text="nTag"></span>
+                        <button type="button" @click="removeNewTag(nTag)" class="hover:text-primary-900 dark:hover:text-primary-200">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </span>
+                </template>
+            </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+            <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Tags Existentes</h4>
+            
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <template x-for="tag in filteredTags" :key="tag.id">
+                    <div class="flex items-center">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input 
+                                type="checkbox" 
+                                x-model="selectedTags" 
+                                :value="tag.id" 
+                                class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:focus:ring-offset-gray-900"
+                            />
+                            <span class="text-sm text-gray-700 dark:text-gray-300" x-text="tag.name"></span>
+                        </label>
+                    </div>
+                </template>
+            </div>
+
+            <div x-show="filteredTags.length === 0" style="display: none;">
+                <p class="text-center text-sm text-gray-500 py-4">
+                    No se encontraron coincidencias. Presiona enter para agregarlo como nuevo.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <x-slot name="footer">
+        <div class="flex justify-end gap-x-4">
+            <x-w-button flat label="Cancelar" wire:click="$set('tagsModal', false)" />
+            <x-w-button primary label="Guardar Tags" wire:click="saveTags" />
+        </div>
+    </x-slot>
+</x-w-modal-card>

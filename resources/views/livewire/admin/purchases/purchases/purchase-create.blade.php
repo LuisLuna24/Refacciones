@@ -19,20 +19,28 @@
 
         <div class="lg:w-3/5 space-y-4">
             <x-w-card>
-                <div class="flex justify-between items-center mb-4 border-b pb-2 dark:border-gray-700">
+                <div class="flex flex-col mb-4 border-b pb-2 dark:border-gray-700">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Selección de Insumos</h2>
                     </div>
 
-                    <div class="relative w-full max-w-xs md:max-w-md">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
+                    <div class="flex flex-1 w-full max-w-2xl gap-2">
+                        <div class="w-1/3">
+                            <x-w-select placeholder="Categoría" wire:model.live="category_id" :async-data="['api' => route('api.categories.index'), 'method' => 'GET']"
+                                option-label="name" option-value="id" />
                         </div>
-                        <input wire:model.live.debounce.300ms="search" type="text" placeholder="Buscar insumo..."
-                            class="pl-10 w-full border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                        <div class="relative w-2/3">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input wire:model.live.debounce.300ms="search" type="text"
+                                placeholder="Buscar por nombre o SKU..."
+                                class="pl-10 w-full border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 transition-shadow">
+                        </div>
                     </div>
                 </div>
 
@@ -118,8 +126,7 @@
                             Recepción de Compra
                         </h2>
                     </div>
-                    <span
-                        class="text-sm font-mono font-bold text-black bg-gray-200 px-2 py-1 rounded">
+                    <span class="text-sm font-mono font-bold text-black bg-gray-200 px-2 py-1 rounded">
                         {{ $serie }}-{{ $correlative }}
                     </span>
                 </div>
@@ -133,15 +140,15 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div class="col-span-1 md:col-span-2">
                                     <x-w-select label="Proveedor" placeholder="Seleccione un proveedor"
-                                        wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'GET',]" option-label="name"
+                                        wire:model.live="supplier_id" :async-data="['api' => route('api.suppliers.index'), 'method' => 'GET']" option-label="name"
                                         option-value="id" :clearable="false" :disabled="count($products) > 0" />
                                 </div>
 
-                                <x-w-select label="Almacén Destino *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]"
+                                <x-w-select label="Almacén Destino *" wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET']"
                                     option-label="name" option-value="id" :disabled="count($products) > 0" />
 
                                 <x-w-select label="Importar Orden" placeholder="Opcional..."
-                                    wire:model.live="purchase_order_id" :async-data="['api' => route('api.purchase-orders.index'), 'method' => 'GET',]" option-label="name"
+                                    wire:model.live="purchase_order_id" :async-data="['api' => route('api.purchase-orders.index'), 'method' => 'GET']" option-label="name"
                                     option-value="id" option-description="description" />
                             </div>
 

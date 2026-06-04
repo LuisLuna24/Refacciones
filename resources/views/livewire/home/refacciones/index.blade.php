@@ -135,41 +135,4 @@
             @endif
         </div>
     </section>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-
-    @script
-        <script>
-            const runEntranceAnimations = () => {
-                // Verificamos que GSAP esté definido antes de intentar usarlo
-                if (typeof gsap === 'undefined') return;
-
-                // Usamos gsap.from() en lugar de fromTo() porque ya quitamos el opacity:0 de CSS
-                gsap.from('.fade-in-up, .product-card', {
-                    opacity: 0,
-                    y: 20,
-                    duration: 0.5,
-                    stagger: 0.08,
-                    ease: "power2.out",
-                    clearProps: "all" // Limpia el estilo in-line al terminar para evitar bugs con Livewire
-                });
-            };
-
-            // 1. Un pequeño intervalo de seguridad para esperar a que el CDN de GSAP cargue
-            const waitForGsap = setInterval(() => {
-                if (window.gsap) {
-                    clearInterval(waitForGsap);
-                    runEntranceAnimations();
-                }
-            }, 50);
-
-            // 2. Escuchamos específicamente la actualización del DOM de Livewire v3
-            Livewire.hook('morph.updated', ({
-                component,
-                el
-            }) => {
-                runEntranceAnimations();
-            });
-        </script>
-    @endscript
 </div>

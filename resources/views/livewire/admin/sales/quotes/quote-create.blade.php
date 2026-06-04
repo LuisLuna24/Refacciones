@@ -20,23 +20,29 @@
         <!-- LADO IZQUIERDO: Catálogo de Productos -->
         <div class="lg:w-3/5 space-y-4">
             <x-w-card shadow="lg">
-                <div
-                    class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4 dark:border-gray-700 gap-4">
+                <div class="flex flex-col mb-4 border-b pb-4 dark:border-gray-700 gap-4">
                     <div>
                         <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">Catálogo para Cotizar</h2>
                         <p class="text-xs text-gray-500 italic">Haz clic en un producto para agregarlo a la propuesta</p>
                     </div>
 
-                    <div class="relative w-full max-w-md">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
+                    <div class="flex flex-1 w-full max-w-2xl gap-2">
+                        <div class="w-1/3">
+                            <x-w-select placeholder="Categoría" wire:model.live="category_id" :async-data="['api' => route('api.categories.index'), 'method' => 'GET']"
+                                option-label="name" option-value="id" />
                         </div>
-                        <input wire:model.live.debounce.300ms="search" type="text"
-                            placeholder="Buscar por nombre, SKU..."
-                            class="pl-10 w-full border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500">
+                        <div class="relative w-2/3">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <input wire:model.live.debounce.300ms="search" type="text"
+                                placeholder="Buscar por nombre o SKU..."
+                                class="pl-10 w-full border-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 rounded-lg shadow-sm focus:ring-emerald-500 focus:border-emerald-500 transition-shadow">
+                        </div>
                     </div>
                 </div>
 
@@ -155,7 +161,7 @@
                             class="bg-emerald-50/30 dark:bg-gray-900/50 p-3 rounded-lg border border-emerald-100 dark:border-gray-700 space-y-3">
                             <div class="grid grid-cols-2 gap-3">
                                 <x-w-select label="Almacén (Ref. Stock)" placeholder="Seleccionar..."
-                                    wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET',]" option-label="name"
+                                    wire:model.live="warehouse_id" :async-data="['api' => route('api.warehouses.index'), 'method' => 'GET']" option-label="name"
                                     option-value="id" :clearable="false" />
                                 <x-w-input type="date" wire:model="date" label="Fecha Validez" />
                             </div>
@@ -244,7 +250,7 @@
                         <div
                             class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 space-y-3">
                             <x-w-select label="Cliente Potencial" placeholder="Buscar cliente..."
-                                wire:model="customer_id" :async-data="['api' => route('api.customers.index'), 'method' => 'GET',]" option-label="name" option-value="id" />
+                                wire:model="customer_id" :async-data="['api' => route('api.customers.index'), 'method' => 'GET']" option-label="name" option-value="id" />
 
                             <x-w-textarea label="Condiciones Especiales" wire:model="observation"
                                 placeholder="Validez de oferta, tiempo de entrega, formas de pago..."
