@@ -36,6 +36,14 @@ return [
             ],
             [
                 'type' => 'link',
+                'title' => 'Viniles',
+                'route' => 'admin.viniles.index',
+                'icon' => 'svg/box.svg',
+                'active' => 'admin.viniles.*',
+                'can' => ['view-viniles'],
+            ],
+            [
+                'type' => 'link',
                 'title' => 'Almacenes',
                 'route' => 'admin.warehouses.index',
                 'icon' => 'svg/building-warehouse.svg',
