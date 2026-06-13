@@ -27,6 +27,7 @@ class VinilTable extends DataTableComponent
             Column::make("Id", "id")
                 ->sortable(),
             Column::make("Nombre", "name")
+                ->searchable()
                 ->sortable(),
             Column::make("Presion (g)", "pressure")
                 ->sortable(),
@@ -53,10 +54,13 @@ class VinilTable extends DataTableComponent
 
     public $priceModal = false;
     public $prices = [];
+    public $unidadType = '';
 
     public function showPrices($id)
     {
         $this->priceModal = true;
-        $this->prices = VinilType::find($id)->prices;
+        $vinilType = VinilType::find($id);
+        $this->unidadType = $vinilType->unity;
+        $this->prices = $vinilType->prices;
     }
 }

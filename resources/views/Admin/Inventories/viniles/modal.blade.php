@@ -10,7 +10,7 @@
                         {{ $price->name ?? 'Precio Base' }}
                     </span>
                     <span class="text-xs text-gray-400 dark:text-zinc-500 block">
-                        Mínimo: {{ $price->min_quantity ?? 1 }} unidades
+                        Unidad: {{ $unidadType }}
                     </span>
                 </div>
                 <span class="text-emerald-600 dark:text-emerald-400 font-semibold text-lg">
