@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('pressure', 10, 2)->nullable();
+            $table->decimal('price_default', 10, 2)->nullable();
+            $table->string('unity')->nullable();
             $table->timestamps();
         });
     }

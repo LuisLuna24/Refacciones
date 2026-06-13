@@ -30,6 +30,10 @@ class VinilTable extends DataTableComponent
                 ->sortable(),
             Column::make("Presion (g)", "pressure")
                 ->sortable(),
+            Column::make("Unity", "unity")
+                ->deselected(),
+            Column::make("Precio default", "price_default")
+                ->deselected(),
             Column::make("Precios", "pricces")
                 ->label(function ($row) {
                     return view('Admin.Inventories.viniles.prices', ['vinilType' => $row]);
@@ -45,5 +49,14 @@ class VinilTable extends DataTableComponent
     {
         return VinilType::query()
             ->with(['prices']);
+    }
+
+    public $priceModal = false;
+    public $prices = [];
+
+    public function showPrices($id)
+    {
+        $this->priceModal = true;
+        $this->prices = VinilType::find($id)->prices;
     }
 }

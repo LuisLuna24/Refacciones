@@ -1,10 +1,10 @@
-<x-admin-layout title="Viniles | Inventarios" :breadcrumbs="[
+<x-admin-layout title="Personalizados | Inventarios" :breadcrumbs="[
     [
         'name' => 'Dashboard',
         'href' => route('admin.dashboard'),
     ],
     [
-        'name' => 'Viniles',
+        'name' => 'Personalizados',
     ],
 ]">
 
@@ -23,7 +23,7 @@
         <div class="min-w-0 flex-1">
             <h1
                 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
-                {{ __('Viniles') }}
+                {{ __('Personalizados') }}
             </h1>
         </div>
 

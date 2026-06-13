@@ -15,6 +15,8 @@ class Forms extends Component
     public $name = '';
     public $pressure = 0;
     public $prices = [];
+    public $unity;
+    public $price_default;
     public $typeForm = 1; // 1 para crear, 2 para editar
     public $id;
 
@@ -25,7 +27,9 @@ class Forms extends Component
             $this->id = $this->vinilType->id;
             $this->name = $this->vinilType->name;
             $this->pressure = $this->vinilType->pressure;
-            
+            $this->unity = $this->vinilType->unity;
+            $this->price_default = $this->vinilType->price_default;
+
             // Mapeamos los precios existentes a la estructura que espera Alpine
             $this->prices = $this->vinilType->prices->map(function ($price) {
                 return [
@@ -34,7 +38,7 @@ class Forms extends Component
                     'price' => $price->price,
                 ];
             })->toArray();
-            
+
             $this->typeForm = 2;
         }
     }
@@ -43,7 +47,9 @@ class Forms extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'pressure' => 'required|numeric|min:0',
+            'pressure' => 'nullable|numeric|min:0',
+            'unity' => 'nullable|string',
+            'price_default' => 'nullable|numeric|min:0',
             'prices' => 'array',
             'prices.*.description' => 'required|string',
             'prices.*.price' => 'required|numeric|min:0',
@@ -53,10 +59,12 @@ class Forms extends Component
         try {
             // 1. Guardar el Vinil Principal
             $vinil = VinilType::updateOrCreate(
-                ['id' => $this->id], 
+                ['id' => $this->id],
                 [
                     'name' => $this->name,
                     'pressure' => $this->pressure,
+                    'unity' => $this->unity,
+                    'price_default' => $this->price_default,
                 ]
             );
 
@@ -66,7 +74,7 @@ class Forms extends Component
                 $precioRecord = $vinil->prices()->updateOrCreate(
                     ['id' => $price['id'] ?? null],
                     [
-                        'name' => $price['description'], 
+                        'name' => $price['description'],
                         'price' => $price['price']
                     ]
                 );
@@ -86,16 +94,16 @@ class Forms extends Component
             }
 
             $this->dispatch('swal', ['icon' => 'success', 'title' => 'Éxito', 'text' => $text]);
-            
-            return redirect()->route('admin.viniles.index');
 
+            return redirect()->route('admin.viniles.index');
         } catch (\Exception $e) {
             // El Rollback SIEMPRE debe ir primero
-            DB::rollBack(); 
-            
+            DB::rollBack();
+
+            dd($e->getMessage());
             // Guardamos el error en el log en lugar de romper la pantalla con dd()
             Log::error("Error guardando vinil: " . $e->getMessage());
-            
+
             $this->dispatch('swal', ['icon' => 'error', 'title' => 'Error', 'text' => 'Lo sentimos, ha ocurrido un error inesperado.']);
         }
     }

@@ -16,7 +16,7 @@ return [
         'type' => 'group',
         'title' => 'Inventario',
         'icon' => 'svg/packages.svg',
-        'active' => ['admin.categories.*', 'admin.products.*', 'admin.warehouses.*'],
+        'active' => ['admin.categories.*', 'admin.products.*', 'admin.warehouses.*', 'admin.viniles.*'],
         'items' => [
             [
                 'type' => 'link',
@@ -36,7 +36,7 @@ return [
             ],
             [
                 'type' => 'link',
-                'title' => 'Viniles',
+                'title' => 'Personalizados',
                 'route' => 'admin.viniles.index',
                 'icon' => 'svg/box.svg',
                 'active' => 'admin.viniles.*',
@@ -94,7 +94,7 @@ return [
         'type' => 'group',
         'title' => 'Ventas',
         'icon' => 'svg/cash-register.svg',
-        'active' => ['admin.customers.*', 'admin.quotes.*', 'admin.sales.*','admin.delivery_notes.*'],
+        'active' => ['admin.customers.*', 'admin.quotes.*', 'admin.sales.*', 'admin.delivery_notes.*'],
         'items' => [
             [
                 'type' => 'link',

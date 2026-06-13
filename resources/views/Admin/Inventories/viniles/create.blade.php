@@ -1,14 +1,14 @@
-<x-admin-layout title="Nuevo Vinil | Inventarios" :breadcrumbs="[
+<x-admin-layout title="Nuevo Personalizados | Inventarios" :breadcrumbs="[
     [
         'name' => 'Dashboard',
         'href' => route('admin.dashboard'),
     ],
     [
-        'name' => 'Viniles',
+        'name' => 'Personalizados',
         'href' => route('admin.viniles.index'),
     ],
     [
-        'name' => 'Nuevo Vinil',
+        'name' => 'Nuevo Personalizados',
     ],
 ]">
 
@@ -16,7 +16,7 @@
         <div class="min-w-0 flex-1">
             <h1
                 class="text-2xl font-bold leading-7 text-gray-900 dark:text-white sm:truncate sm:text-3xl sm:tracking-tight">
-                {{ __('Nuevo Vinil') }}
+                {{ __('Nuevo Personalizados') }}
             </h1>
         </div>
     </div>

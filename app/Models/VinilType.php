@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VinilType extends Model
 {
-    protected $fillable = ['name', 'pressure'];
+    protected $fillable = ['name', 'pressure', 'unity', 'price_default'];
 
     public function prices()
     {
