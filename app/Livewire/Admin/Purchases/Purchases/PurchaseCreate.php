@@ -41,6 +41,8 @@ class PurchaseCreate extends Component
         $this->date = now()->format('Y-m-d');
         $this->serie = 'COM' . now()->format('Y');
         $this->correlative = Purchase::max('id') + 1;
+
+        $this->warehouse_id = Auth::user()->warehouse_id;
     }
 
     // Detectar cambios (ej. cargar Orden de Compra)
@@ -92,8 +94,13 @@ class PurchaseCreate extends Component
     {
         $this->validate([
             'product_id' => ['required', 'exists:products,id'],
-            'warehouse_id' => ['required', 'exists:warehouses,id']
-        ], [], ['product_id' => 'producto', 'warehouse_id' => 'almacén']);
+            'warehouse_id' => ['required', 'exists:warehouses,id'],
+            'supplier_id' => ['required', 'exists:suppliers,id']
+        ], [], [
+            'product_id' => 'producto',
+            'warehouse_id' => 'almacén',
+            'supplier_id' => 'proveedor'
+        ]);
 
         $existing = collect($this->products)->firstWhere('id', $this->product_id);
 

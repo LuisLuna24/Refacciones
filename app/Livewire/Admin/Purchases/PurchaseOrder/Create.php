@@ -132,7 +132,7 @@ class Create extends Component
                 'warehouse_id' => $this->warehouse_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
-                'status' => 'pending'
+                'status' => 0
             ]);
 
             foreach ($this->products as $product) {
