@@ -38,7 +38,7 @@ class Forms extends Component
     {
         $this->date = now()->format('Y-m-d');
         $this->serie = 'NOTE' . now()->format('Y');
-        $this->correlative = (DeliveryNote::max('correlative') ?? 0) + 1;
+        $this->correlative = DeliveryNote::max('id') + 1;
         $this->addItem();
 
         if (isset($this->deliveryNote)) {

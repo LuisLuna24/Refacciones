@@ -6,6 +6,7 @@ use App\Facades\Kardex;
 use App\Models\Inventory;
 use App\Models\Movement;
 use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -34,15 +35,14 @@ class MovementCreate extends Component
     public function mount()
     {
 
-        $this->warehouse_id = auth()->user()->warehouse_id; // Asignar el almacén de la sesión
+        $this->warehouse_id = Auth::user()->warehouse_id; // Asignar el almacén de la sesión
         $this->date = now()->format('Y-m-d');
         $this->serie = 'MOV' . now()->format('Y');
-        $this->correlative = (Movement::max('correlative') ?? 0) + 1;
+        $this->correlative = Movement::max('id') + 1;
     }
 
     public function updated($property, $value)
     {
-        // Si cambia el tipo o el almacén, limpiamos la lista para evitar inconsistencias
         if ($property === 'type' || $property === 'warehouse_id') {
             $this->reset('reason_id', 'products', 'total', 'search');
         }
@@ -89,7 +89,7 @@ class MovementCreate extends Component
             ->first();
 
         $currentStock = $inventory?->quantity_balance ?? 0;
-        $costBalance = $inventory?->cost_balance ?? $product->cost;
+        $costBalance = $inventory?->cost_balance ?? $product->cost ?? 0;
 
         // Validación Estricta para SALIDAS
         if ($this->type == 2 && $currentStock <= 0) {
@@ -119,13 +119,18 @@ class MovementCreate extends Component
         $this->validate([
             'type' => ['required', 'in:1,2'],
             'date' => ['nullable', 'date'],
-            'reason_id' => ['nullable', 'exists:reasons,id'],
+            'reason_id' => ['required', 'exists:reasons,id'],
             'warehouse_id' => ['required', 'exists:warehouses,id'],
             'total' => ['required', 'numeric', 'min:0'],
             'observation' => ['nullable', 'string', 'max:255'],
             'products' => ['required', 'array', 'min:1'],
             'products.*.quantity' => ['required', 'numeric', 'min:0.01'],
+            'products.*.price' => ['required', 'numeric', 'min:0'],
         ], [], ['products' => 'productos']);
+
+        $this->total = collect($this->products)->sum(function ($p) {
+            return ($p['quantity'] ?? 0) * ($p['price'] ?? 0);
+        });
 
         // Validación final de stock para Salidas antes de guardar
         if ($this->type == 2) {
@@ -195,7 +200,7 @@ class MovementCreate extends Component
                         ->limit(1)
                 ]);
             })
-            ->paginate(16, pageName:'products-page');
+            ->paginate(16, pageName: 'products-page');
 
         return view('livewire.admin.movements.movements.movement-create', compact('catalog'));
     }

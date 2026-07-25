@@ -40,7 +40,7 @@ class PurchaseCreate extends Component
     {
         $this->date = now()->format('Y-m-d');
         $this->serie = 'COM' . now()->format('Y');
-        $this->correlative = (Purchase::max('correlative') ?? 0) + 1;
+        $this->correlative = Purchase::max('id') + 1;
     }
 
     // Detectar cambios (ej. cargar Orden de Compra)

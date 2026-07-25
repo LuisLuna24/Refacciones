@@ -37,7 +37,7 @@ class QuoteCreate extends Component
     {
         $this->date = now()->format('Y-m-d');
         $this->serie = 'COT' . now()->format('Y');
-        $this->correlative = (Quote::max('correlative') ?? 0) + 1;
+        $this->correlative = Quote::max('id') + 1;
 
         $this->warehouse_id = Auth::user()->warehouse_id;
     }

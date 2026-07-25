@@ -39,7 +39,7 @@ class SaleCreate extends Component
         $this->date = now()->format('Y-m-d');
         $this->serie = 'VEN' . now()->format('Y');
         // Asegúrate de que Sale::max('correlative') maneje el caso de tabla vacía
-        $this->correlative = (Sale::max('correlative') ?? 0) + 1;
+        $this->correlative = Sale::max('id') + 1;
         $this->warehouse_id = Auth::user()->warehouse_id;
     }
 
