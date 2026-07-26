@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\Inventories\CategoryController;
 use App\Http\Controllers\Admin\Inventories\ProductController;
+use App\Http\Controllers\Admin\Inventories\VinilTypeController;
 use App\Http\Controllers\Admin\Inventories\WarehouseController;
 use App\Http\Controllers\Admin\Inventory\ImageController;
 use App\Http\Controllers\Admin\Movements\MovementController;
@@ -23,10 +24,16 @@ Route::get('/dashboard', function () {
 })->name('dashboard');
 
 //========== Categorias
-Route::resource('categories', CategoryController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('categories', CategoryController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Productos
-Route::resource('products', ProductController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('products', ProductController::class)->only('index', 'create', 'edit', 'destroy');
+
+Route::resource('viniles', VinilTypeController::class)
+    ->only('index', 'create', 'edit', 'destroy')
+    ->parameters([
+        'viniles' => 'vinilType'
+    ]);
 
 Route::post('products/{product}/dropzone', [ProductController::class, 'dropzone'])->name('products.dropzone');
 
@@ -39,15 +46,15 @@ Route::get('/products/import', [ProductController::class, 'import'])->name('prod
 Route::get('products/{product}/Kardex', [ProductController::class, 'Kardex'])->name('products.Kardex');
 
 //========== Customers
-Route::resource('customers', CustomerController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('customers', CustomerController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Suppliers
 
-Route::resource('suppliers', SupplierController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('suppliers', SupplierController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Warehouses
 
-Route::resource('warehouses', WarehouseController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('warehouses', WarehouseController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Purchace Order
 
@@ -97,11 +104,11 @@ Route::get('reports/box-buts', [ReportController::class, 'lowStock'])->name('box
 
 //========== Users
 
-Route::resource('users', UsersController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('users', UsersController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Roles
 
-Route::resource('roles', RoleController::class)->only('index', 'create', 'edit','destroy');
+Route::resource('roles', RoleController::class)->only('index', 'create', 'edit', 'destroy');
 
 //========== Delivery Notes
 

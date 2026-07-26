@@ -226,7 +226,8 @@
                         </div>
 
                         <div class="border rounded-lg overflow-hidden flex flex-col h-[350px] transition-colors"
-                            :class="isEntry ? 'bg-gray-100 dark:bg-gray-800 border-lime-500' : 'bg-gray-100 dark:bg-gray-800 border-red-500'">
+                            :class="isEntry ? 'bg-gray-100 dark:bg-gray-800 border-lime-500' :
+                                'bg-gray-100 dark:bg-gray-800 border-red-500'">
 
                             <div class="grid grid-cols-12 gap-2 p-2 text-xs font-bold uppercase border-b"
                                 :class="isEntry ? 'bg-lime-50 text-lime-800 border-lime-100' :
@@ -257,13 +258,16 @@
                                             <input type="number" x-model.number="product.quantity" min="1"
                                                 x-bind:max="!isEntry ? product.stock_actual : ''"
                                                 class="w-full h-8 text-center text-sm border-gray-300 rounded focus:ring-2 p-1"
-                                                x-bind:class="isEntry ? 'focus:ring-lime-500 bg-gray-100 dark:bg-gray-800' : 'focus:ring-rose-500 bg-gray-100 dark:bg-gray-800'">
+                                                x-bind:class="isEntry ? 'focus:ring-lime-500 bg-gray-100 dark:bg-gray-800' :
+                                                    'focus:ring-rose-500 bg-gray-100 dark:bg-gray-800'">
                                         </div>
 
                                         <div class="col-span-3 text-right">
-                                            <div class="text-sm font-mono text-gray-600 dark:text-gray-300"
-                                                x-text="'$' + Number(product.price).toFixed(2)"></div>
-                                            <div class="text-[9px] text-gray-400">
+                                            <input type="number" step="0.01" x-model.number="product.price"
+                                                class="w-full text-right text-sm border-gray-300 rounded focus:ring-2 p-1"
+                                                x-bind:class="isEntry ? 'focus:ring-lime-500 bg-gray-100 dark:bg-gray-800' :
+                                                    'focus:ring-rose-500 bg-gray-100 dark:bg-gray-800'">
+                                            <div class="text-[9px] text-gray-400 mt-1">
                                                 Sub: $<span
                                                     x-text="((product.quantity || 0) * (product.price || 0)).toFixed(2)"></span>
                                             </div>
@@ -293,7 +297,8 @@
                         </div>
 
                         <div class="p-4 rounded-xl space-y-3 border transition-colors"
-                            :class="isEntry ? 'bg-gray-100 dark:bg-gray-800 border-lime-500' : 'bg-gray-100 dark:bg-gray-800 border-red-500'">
+                            :class="isEntry ? 'bg-gray-100 dark:bg-gray-800 border-lime-500' :
+                                'bg-gray-100 dark:bg-gray-800 border-red-500'">
 
                             <x-w-textarea label="Observaciones" wire:model="observation" placeholder="..."
                                 rows="1" />

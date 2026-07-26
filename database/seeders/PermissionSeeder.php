@@ -109,6 +109,12 @@ class PermissionSeeder extends Seeder
             'edit-delivery-notes',
             'delete-delivery-notes',
             'view-delivery-notes',
+
+            //Viniles
+            'create-viniles',
+            'edit-viniles',
+            'delete-viniles',
+            'view-viniles',
         ];
 
         foreach ($permissions as $permission) {

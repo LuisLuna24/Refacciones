@@ -37,7 +37,7 @@ class Create extends Component
     {
         $this->date = now()->format('Y-m-d');
         $this->serie = 'OC' . now()->format('Y');
-        $this->correlative = (PurchaseOrder::max('correlative') ?? 0) + 1;
+        $this->correlative = PurchaseOrder::max('id') + 1;
 
         $this->warehouse_id = Auth::user()->warehouse_id;
     }
@@ -132,7 +132,7 @@ class Create extends Component
                 'warehouse_id' => $this->warehouse_id,
                 'total' => $this->total,
                 'observation' => $this->observation,
-                'status' => 'pending'
+                'status' => 0
             ]);
 
             foreach ($this->products as $product) {
