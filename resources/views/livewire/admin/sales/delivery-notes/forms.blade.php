@@ -155,7 +155,7 @@
 
                                         <td class="px-4 py-3 max-w-xs">
                                             <x-w-select wire:model.live="items.{{ $index }}.product_id"
-                                                placeholder="-- Pedido personalizado --" :async-data="route('api.productsnotes.index')"
+                                                placeholder="-- Pedido personalizado --" :async-data="['api' => route('api.productsnotes.index'), 'method' => 'GET',]"
                                                 option-label="name" option-value="id" :disabled="$status == 3" />
                                         </td>
 

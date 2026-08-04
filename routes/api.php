@@ -53,7 +53,11 @@ Route::get('/products/notes', function (Request $request) {
                   ->orWhere('barcode', 'like', '%' . $search . '%');
             });
         })
-        ->limit(10) // No necesitas un 'when' si el límite aplica siempre que no hay 'selected' (ajustado para ser consistente, asumiendo que no necesitas selected aquí)
+        ->when(
+            $request->filled('selected'),
+            fn ($query) => $query->whereIn('id', $request->input('selected', [])),
+            fn ($query) => $query->limit(10)
+        )
         ->orderBy('name')
         ->get();
 })->name('api.productsnotes.index');

@@ -1,10 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\Inventories\CategoryController;
+use App\Http\Controllers\Admin\Inventories\ImageController;
 use App\Http\Controllers\Admin\Inventories\ProductController;
 use App\Http\Controllers\Admin\Inventories\VinilTypeController;
 use App\Http\Controllers\Admin\Inventories\WarehouseController;
-use App\Http\Controllers\Admin\Inventory\ImageController;
 use App\Http\Controllers\Admin\Movements\MovementController;
 use App\Http\Controllers\Admin\Movements\TransferController;
 use App\Http\Controllers\Admin\Purchase\PurchaseController;
@@ -112,4 +112,6 @@ Route::resource('roles', RoleController::class)->only('index', 'create', 'edit',
 
 //========== Delivery Notes
 
-Route::resource('delivery_notes', DeliveryNoteController::class)->only('index', 'create', 'edit');
+Route::get('delivery_notes/{delivery_note}/pdf', [DeliveryNoteController::class, 'pdf'])->name('delivery_notes.pdf');
+
+Route::resource('delivery_notes', DeliveryNoteController::class)->only(['index', 'create', 'edit']);

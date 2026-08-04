@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Inventory;
+namespace App\Http\Controllers\Admin\Inventories;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;

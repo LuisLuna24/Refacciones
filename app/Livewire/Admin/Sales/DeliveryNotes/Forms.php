@@ -65,7 +65,7 @@ class Forms extends Component
             foreach ($this->deliveryNote->items as $item) {
                 $this->items[] = [
                     'product_id' => $item->product_id,
-                    'description' => $item->description,
+                    'description' => $item->product_id ? $item->product->name : $item->description,
                     'quantity' => $item->quantity,
                     'price' => $item->price,
                 ];
@@ -116,7 +116,7 @@ class Forms extends Component
                 }
 
                 // 3. Si NO existe, consultamos la BD como lo hacíamos antes
-                $product = Product::find($value);
+                $product = Product::findorFail($value);
 
                 if ($product) {
                     $this->items[$index]['price'] = $product->price;

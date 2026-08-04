@@ -21,6 +21,7 @@ class DeliveryNoteTable extends DataTableComponent
     public function configure(): void
     {
         $this->setPrimaryKey('id');
+        $this->setDefaultSort('id', 'desc');
 
         $this->setConfigurableAreas([
             'after-wrapper' => 'Admin.Sales.delivery-notes.modals',
@@ -136,5 +137,13 @@ class DeliveryNoteTable extends DataTableComponent
                 'text' => 'Lo sentimos, ha ocurrido un error inesperado.'
             ]);
         }
+    }
+
+    public function closeModal(){
+        $this->reset(['modalNoteDelivery', 'deliveryNoteId', 'newStatus']);
+    }
+    public function closeCancelModal()
+    {
+        $this->reset(['modalCancelDelivery', 'deliveryNoteId', 'newStatus']);
     }
 }
