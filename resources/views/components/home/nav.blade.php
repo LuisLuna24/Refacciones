@@ -95,7 +95,7 @@
             <li class="mt-4 border-t border-neutral-100 pt-4 dark:border-neutral-800">
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center justify-between rounded-xl bg-amber-500 p-4 text-white">
-                    <span class="font-bold">Panel de Administración</span>
+                    <span class="font-bold">Panel</span>
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 7l5 5m0 0l-5 5m5-5H6" />

@@ -92,18 +92,28 @@
                 </div>
 
                 <div class="flex items-center space-x-3">
+                    <x-w-mini-button rounded icon="clipboard-document"
+                        href="{{ route('admin.delivery_notes.create') }}" />
+                    <x-w-mini-button rounded positive icon="shopping-cart" href="{{ route('admin.sales.create') }}" />
                     <button @click="toggleTheme"
                         class="p-2 text-gray-500 rounded-xl bg-gray-100 dark:bg-gray-800 dark:text-yellow-400 hover:ring-2 ring-blue-500 transition-all">
                         <template x-if="!darkMode">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-moon">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path
+                                    d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" />
                             </svg>
                         </template>
                         <template x-if="darkMode">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-sun">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" />
+                                <path
+                                    d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" />
                             </svg>
                         </template>
                     </button>
