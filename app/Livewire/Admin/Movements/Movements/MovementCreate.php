@@ -67,6 +67,30 @@ class MovementCreate extends Component
         $this->addProduct();
     }
 
+    /**
+     * Aumenta la cantidad de un producto ya agregado (respeta stock en salidas).
+     */
+    public function incrementFromCard($id)
+    {
+        $index = collect($this->products)->search(fn ($item) => (int) $item['id'] === (int) $id);
+
+        if ($index === false) {
+            $this->addFromCard($id);
+            return;
+        }
+
+        if ($this->type == 2 && $this->products[$index]['quantity'] >= (float) $this->products[$index]['stock_actual']) {
+            $this->dispatch('swal', [
+                'icon' => 'warning',
+                'title' => 'Máximo disponible',
+                'text' => 'No hay más stock disponible para este producto.',
+            ]);
+            return;
+        }
+
+        $this->products[$index]['quantity'] = (float) $this->products[$index]['quantity'] + 1;
+    }
+
     public function addProduct()
     {
         $this->validate([

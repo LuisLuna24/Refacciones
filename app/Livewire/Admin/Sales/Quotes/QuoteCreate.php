@@ -51,6 +51,21 @@ class QuoteCreate extends Component
         $this->addProduct();
     }
 
+    /**
+     * Aumenta la cantidad de un producto ya agregado a la cotización.
+     */
+    public function incrementFromCard($id)
+    {
+        $index = collect($this->products)->search(fn ($item) => (int) $item['id'] === (int) $id);
+
+        if ($index === false) {
+            $this->addFromCard($id);
+            return;
+        }
+
+        $this->products[$index]['quantity'] = (float) $this->products[$index]['quantity'] + 1;
+    }
+
     public function addProduct()
     {
         $this->validate([
@@ -65,7 +80,7 @@ class QuoteCreate extends Component
             $this->dispatch('swal', [
                 'icon' => 'info',
                 'title' => 'Ya agregado',
-                'text' => 'Este producto ya está en la lista. Puedes aumentar la cantidad.',
+                'text' => 'Este producto ya está en la lista. Toca la tarjeta otra vez para aumentar la cantidad.',
             ]);
             return;
         }

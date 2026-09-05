@@ -59,6 +59,21 @@ class Create extends Component
         $this->addProduct();
     }
 
+    /**
+     * Aumenta la cantidad de un producto ya agregado a la orden.
+     */
+    public function incrementFromCard($id)
+    {
+        $index = collect($this->products)->search(fn ($item) => (int) $item['id'] === (int) $id);
+
+        if ($index === false) {
+            $this->addFromCard($id);
+            return;
+        }
+
+        $this->products[$index]['quantity'] = (float) $this->products[$index]['quantity'] + 1;
+    }
+
     public function addProduct()
     {
         $this->validate([

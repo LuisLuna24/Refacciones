@@ -90,6 +90,21 @@ class PurchaseCreate extends Component
         $this->addProduct();
     }
 
+    /**
+     * Aumenta la cantidad de un producto ya agregado a la recepción.
+     */
+    public function incrementFromCard($id)
+    {
+        $index = collect($this->products)->search(fn ($item) => (int) $item['id'] === (int) $id);
+
+        if ($index === false) {
+            $this->addFromCard($id);
+            return;
+        }
+
+        $this->products[$index]['quantity'] = (float) $this->products[$index]['quantity'] + 1;
+    }
+
     public function addProduct()
     {
         $this->validate([
@@ -108,7 +123,7 @@ class PurchaseCreate extends Component
             $this->dispatch('swal', [
                 'icon' => 'info',
                 'title' => 'Producto en lista',
-                'text' => 'Este producto ya está agregado. Ajusta la cantidad en la lista.',
+                'text' => 'Este producto ya está agregado. Toca la tarjeta otra vez para aumentar la cantidad.',
             ]);
             return;
         }

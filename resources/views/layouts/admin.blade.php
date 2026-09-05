@@ -143,9 +143,8 @@
                 </div>
             </header>
 
-            <main id="main-content"
-                class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-950 p-6 md:p-10">
-                <div class="max-w-7xl mx-auto">
+            <main id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-950">
+                <div class="px-2 sm:px-4 lg:px-6 pt-4">
                     {{ $slot }}
                 </div>
             </main>
